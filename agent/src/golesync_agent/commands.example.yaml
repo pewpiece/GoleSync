@@ -54,6 +54,125 @@ commands:
     command: ["x-terminal-emulator"]
     detach: true
 
+  # --- Keyboard shortcuts (the phone Keys screen has no chords, so these fill the gap) ---
+  - id: copy
+    label: Copy (Ctrl+C)
+    command: ["xdotool", "key", "ctrl+c"]
+
+  - id: paste
+    label: Paste (Ctrl+V)
+    command: ["xdotool", "key", "ctrl+v"]
+
+  - id: cut
+    label: Cut (Ctrl+X)
+    command: ["xdotool", "key", "ctrl+x"]
+
+  - id: select-all
+    label: Select all (Ctrl+A)
+    command: ["xdotool", "key", "ctrl+a"]
+
+  - id: undo
+    label: Undo (Ctrl+Z)
+    command: ["xdotool", "key", "ctrl+z"]
+
+  - id: save
+    label: Save (Ctrl+S)
+    command: ["xdotool", "key", "ctrl+s"]
+
+  - id: find
+    label: Find (Ctrl+F)
+    command: ["xdotool", "key", "ctrl+f"]
+
+  # --- Browser ---------------------------------------------------------------------------
+  - id: browser-new-tab
+    label: New tab
+    command: ["xdotool", "key", "ctrl+t"]
+
+  - id: browser-close-tab
+    label: Close tab
+    command: ["xdotool", "key", "ctrl+w"]
+    confirm: true
+
+  - id: browser-reload
+    label: Reload page
+    command: ["xdotool", "key", "ctrl+r"]
+
+  - id: browser-back
+    label: Back
+    command: ["xdotool", "key", "alt+Left"]
+
+  - id: browser-forward
+    label: Forward
+    command: ["xdotool", "key", "alt+Right"]
+
+  - id: fullscreen
+    label: Fullscreen (F11)
+    command: ["xdotool", "key", "F11"]
+
+  - id: zoom-in
+    label: Zoom in
+    command: ["xdotool", "key", "ctrl+plus"]
+
+  - id: zoom-out
+    label: Zoom out
+    command: ["xdotool", "key", "ctrl+minus"]
+
+  # --- Windows ---------------------------------------------------------------------------
+  - id: maximize
+    label: Maximize window
+    command: ["xdotool", "key", "super+Up"]
+
+  - id: tile-left
+    label: Tile window left
+    command: ["xdotool", "key", "super+Left"]
+
+  - id: tile-right
+    label: Tile window right
+    command: ["xdotool", "key", "super+Right"]
+
+  # --- Sound -----------------------------------------------------------------------------
+  - id: volume-up
+    label: Volume +5%
+    command: ["pactl", "set-sink-volume", "@DEFAULT_SINK@", "+5%"]
+
+  - id: volume-down
+    label: Volume -5%
+    command: ["pactl", "set-sink-volume", "@DEFAULT_SINK@", "-5%"]
+
+  - id: mute-toggle
+    label: Mute / unmute
+    command: ["pactl", "set-sink-mute", "@DEFAULT_SINK@", "toggle"]
+
+  # --- Info (output is shown on the phone) -----------------------------------------------
+  - id: battery
+    label: Battery %
+    command: ["cat", "/sys/class/power_supply/BAT0/capacity"]
+
+  - id: disk-free
+    label: Disk space
+    command: ["df", "-h", "/", "/home"]
+
+  - id: uptime
+    label: Uptime and load
+    command: ["uptime"]
+
+  - id: ip-address
+    label: IP addresses
+    command: ["hostname", "-I"]
+
+  # --- Open folders and sites ------------------------------------------------------------
+  - id: open-inbox
+    label: Open GoleSync Inbox folder
+    command: ["xdg-open", "~/GoleSync/Inbox"]
+
+  - id: open-downloads
+    label: Open Downloads
+    command: ["xdg-open", "~/Downloads"]
+
+  - id: open-youtube
+    label: Open YouTube
+    command: ["xdg-open", "https://www.youtube.com"]
+
   # --- Disabled until you opt in ---------------------------------------------------------
   - id: close-window
     label: Close window (Alt+F4)
@@ -97,5 +216,32 @@ commands:
   - id: shutdown
     label: Shut down
     command: ["systemctl", "poweroff"]
+    confirm: true
+    enabled: false
+
+  - id: wifi-off
+    label: Wi-Fi off (you will lose the phone link!)
+    command: ["nmcli", "radio", "wifi", "off"]
+    confirm: true
+    enabled: false
+
+  - id: wifi-on
+    label: Wi-Fi on
+    command: ["nmcli", "radio", "wifi", "on"]
+    enabled: false
+
+  - id: brightness-up
+    label: Brightness +10% (needs brightnessctl)
+    command: ["brightnessctl", "set", "+10%"]
+    enabled: false
+
+  - id: brightness-down
+    label: Brightness -10% (needs brightnessctl)
+    command: ["brightnessctl", "set", "10%-"]
+    enabled: false
+
+  - id: empty-trash
+    label: Empty trash
+    command: ["gio", "trash", "--empty"]
     confirm: true
     enabled: false

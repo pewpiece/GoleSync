@@ -6,6 +6,7 @@ import asyncio
 import logging
 import os
 import re
+import textwrap
 from pathlib import Path
 
 import yaml
@@ -123,3 +124,43 @@ async def run_command(
             timed_out=True,
             output=tail(out.decode(errors="replace")),
         )
+
+
+def _raw_entries(path: Path) -> list[dict]:
+    try:
+        raw = yaml.safe_load(path.read_text()) or {}
+    except (OSError, yaml.YAMLError):
+        return []
+    items = raw.get("commands", []) if isinstance(raw, dict) else []
+    return [e for e in items if isinstance(e, dict)] if isinstance(items, list) else []
+
+
+def sync_example(user_path: Path, example_path: Path) -> list[str]:
+    """Append example commands whose id is missing from the user's file. Existing entries
+    (including ones the user edited or disabled) are never touched. Returns added ids."""
+    if not user_path.exists():
+        user_path.parent.mkdir(parents=True, exist_ok=True)
+        user_path.write_text(example_path.read_text())
+        return [e["id"] for e in _raw_entries(example_path) if "id" in e]
+    have = {e.get("id") for e in _raw_entries(user_path)}
+    missing = [e for e in _raw_entries(example_path) if e.get("id") not in have]
+    if not missing:
+        return []
+    original = user_path.read_text()
+    block = "".join(
+        textwrap.indent(yaml.safe_dump([e], sort_keys=False, default_flow_style=None), "  ") + "\n"
+        for e in missing
+    )
+    user_data = yaml.safe_load(original) or {}
+    if isinstance(user_data, dict) and user_data.get("commands") and isinstance(user_data["commands"], list):
+        new_text = original.rstrip("\n") + "\n\n  # added by `golesync commands-sync`\n" + block
+    else:
+        new_text = "commands:\n" + block
+    user_path.write_text(new_text)
+    ids = {e["id"] for e in missing}
+    if not ids <= {e.get("id") for e in _raw_entries(user_path)} or not isinstance(
+        yaml.safe_load(user_path.read_text()), dict
+    ):
+        user_path.write_text(original)  # never leave a broken file behind
+        raise ValueError("could not merge into commands.yaml; left it unchanged")
+    return sorted(ids, key=[e["id"] for e in missing].index)

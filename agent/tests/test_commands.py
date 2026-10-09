@@ -164,3 +164,55 @@ def test_shipped_example_is_valid_and_safe_by_default():
         if c.id in {"suspend", "reboot", "shutdown", "close-window"}:
             assert c.confirm and not c.enabled
     assert all(c.command[0] for c in loaded)
+
+
+def test_example_has_no_duplicate_ids_and_valid_risky_entries():
+    from pathlib import Path
+
+    import golesync_agent
+
+    example = Path(golesync_agent.__file__).with_name("commands.example.yaml")
+    raw_ids = [e["id"] for e in __import__("yaml").safe_load(example.read_text())["commands"]]
+    assert len(raw_ids) == len(set(raw_ids))
+    assert len(load_commands(example)) == len(raw_ids)  # none silently skipped as invalid
+    by_id = {c.id: c for c in load_commands(example)}
+    for risky in ("wifi-off", "empty-trash", "reboot", "shutdown", "suspend", "close-window"):
+        assert by_id[risky].confirm and not by_id[risky].enabled
+    assert by_id["browser-close-tab"].confirm
+
+
+def test_sync_adds_only_missing_and_keeps_user_edits(tmp_path):
+    from pathlib import Path
+
+    import golesync_agent
+    from golesync_agent.commands import sync_example
+
+    example = Path(golesync_agent.__file__).with_name("commands.example.yaml")
+    user = tmp_path / "commands.yaml"
+    user.write_text(
+        "# my file\ncommands:\n  - id: lock-screen\n    label: My lock\n    command: [echo, lock]\n    enabled: false\n"
+        "  - id: mine\n    label: Mine\n    command: [echo, hi]\n"
+    )
+    added = sync_example(user, example)
+    assert "lock-screen" not in added and "copy" in added and "mine" not in added
+    loaded = {c.id: c for c in load_commands(user)}
+    assert loaded["lock-screen"].label == "My lock" and loaded["lock-screen"].enabled is False
+    assert loaded["mine"].command == ["echo", "hi"]
+    assert loaded["copy"].command == ["xdotool", "key", "ctrl+c"]
+    assert user.read_text().startswith("# my file")
+    assert sync_example(user, example) == []  # idempotent
+
+
+def test_sync_creates_missing_file_and_repairs_empty_commands(tmp_path):
+    from pathlib import Path
+
+    import golesync_agent
+    from golesync_agent.commands import sync_example
+
+    example = Path(golesync_agent.__file__).with_name("commands.example.yaml")
+    fresh = tmp_path / "new" / "commands.yaml"
+    assert "lock-screen" in sync_example(fresh, example)
+    empty = tmp_path / "empty.yaml"
+    empty.write_text("commands: []\n")
+    assert sync_example(empty, example)
+    assert len(load_commands(empty)) == len(load_commands(example))
