@@ -1,4 +1,4 @@
-GoleSync test run: 2026-10-09T03:27:16Z
+GoleSync test run: 2026-10-09T06:39:25Z
 python: Python 3.13.16 | node: v22.22.0 | npm: 10.9.4
 X11 tooling: Xvfb=/usr/bin/Xvfb xdotool=/usr/bin/xdotool xclip=/usr/bin/xclip
 
@@ -16,167 +16,170 @@ configfile: pyproject.toml
 testpaths: tests
 plugins: platformdirs-4.12.4, asyncio-1.4.0, anyio-4.15.1
 asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
-collecting ... collected 164 items
+collecting ... collected 167 items
 
 tests/test_cli.py::test_init_creates_files PASSED                        [  0%]
 tests/test_cli.py::test_rotate_token_changes_token PASSED                [  1%]
 tests/test_cli.py::test_pause_without_agent_fails_cleanly PASSED         [  1%]
 tests/test_cli.py::test_gsync_alias_declared PASSED                      [  2%]
-tests/test_commands.py::test_list_only_enabled_and_hides_argv PASSED     [  3%]
+tests/test_commands.py::test_list_only_enabled_and_hides_argv PASSED     [  2%]
 tests/test_commands.py::test_run_returns_exit_code_and_output PASSED     [  3%]
 tests/test_commands.py::test_output_is_tailed PASSED                     [  4%]
 tests/test_commands.py::test_unknown_or_malicious_ids_rejected[nope] PASSED [  4%]
 tests/test_commands.py::test_unknown_or_malicious_ids_rejected[hello; rm -rf /] PASSED [  5%]
-tests/test_commands.py::test_unknown_or_malicious_ids_rejected[hello && id] PASSED [  6%]
+tests/test_commands.py::test_unknown_or_malicious_ids_rejected[hello && id] PASSED [  5%]
 tests/test_commands.py::test_unknown_or_malicious_ids_rejected[$(id)] PASSED [  6%]
 tests/test_commands.py::test_unknown_or_malicious_ids_rejected[`id`] PASSED [  7%]
 tests/test_commands.py::test_unknown_or_malicious_ids_rejected[../hello] PASSED [  7%]
 tests/test_commands.py::test_unknown_or_malicious_ids_rejected[hello%00] PASSED [  8%]
-tests/test_commands.py::test_unknown_or_malicious_ids_rejected[HELLO] PASSED [  9%]
+tests/test_commands.py::test_unknown_or_malicious_ids_rejected[HELLO] PASSED [  8%]
 tests/test_commands.py::test_unknown_or_malicious_ids_rejected[off] PASSED [  9%]
 tests/test_commands.py::test_unknown_or_malicious_ids_rejected[Bad ID!] PASSED [ 10%]
 tests/test_commands.py::test_shell_injection_in_id_runs_nothing PASSED   [ 10%]
 tests/test_commands.py::test_body_cannot_smuggle_command_text PASSED     [ 11%]
-tests/test_commands.py::test_no_shell_so_metacharacters_are_literal PASSED [ 12%]
+tests/test_commands.py::test_no_shell_so_metacharacters_are_literal PASSED [ 11%]
 tests/test_commands.py::test_confirm_required PASSED                     [ 12%]
 tests/test_commands.py::test_disabled_command_cannot_run PASSED          [ 13%]
-tests/test_commands.py::test_timeout_kills_process PASSED                [ 14%]
+tests/test_commands.py::test_timeout_kills_process PASSED                [ 13%]
 tests/test_commands.py::test_missing_binary_reports_failure PASSED       [ 14%]
-tests/test_commands.py::test_paused_blocks_commands PASSED               [ 15%]
+tests/test_commands.py::test_paused_blocks_commands PASSED               [ 14%]
 tests/test_commands.py::test_requires_token PASSED                       [ 15%]
 tests/test_commands.py::test_loader_skips_garbage PASSED                 [ 16%]
-tests/test_commands.py::test_shipped_example_is_valid_and_safe_by_default PASSED [ 17%]
-tests/test_input.py::test_event_to_action_mapping[data0-expected0] PASSED [ 17%]
-tests/test_input.py::test_event_to_action_mapping[data1-expected1] PASSED [ 18%]
-tests/test_input.py::test_event_to_action_mapping[data2-expected2] PASSED [ 18%]
-tests/test_input.py::test_event_to_action_mapping[data3-expected3] PASSED [ 19%]
-tests/test_input.py::test_event_to_action_mapping[data4-expected4] PASSED [ 20%]
-tests/test_input.py::test_event_to_action_mapping[data5-expected5] PASSED [ 20%]
-tests/test_input.py::test_event_to_action_mapping[data6-expected6] PASSED [ 21%]
-tests/test_input.py::test_event_to_action_mapping[data7-expected7] PASSED [ 21%]
-tests/test_input.py::test_event_to_action_mapping[data8-expected8] PASSED [ 22%]
-tests/test_input.py::test_event_to_action_mapping[data9-expected9] PASSED [ 23%]
-tests/test_input.py::test_event_to_action_mapping[data10-expected10] PASSED [ 23%]
-tests/test_input.py::test_event_to_action_mapping[data11-expected11] PASSED [ 24%]
-tests/test_input.py::test_event_to_action_mapping[data12-expected12] PASSED [ 25%]
-tests/test_input.py::test_event_to_action_mapping[data13-expected13] PASSED [ 25%]
-tests/test_input.py::test_invalid_events_rejected[data0] PASSED          [ 26%]
-tests/test_input.py::test_invalid_events_rejected[data1] PASSED          [ 26%]
-tests/test_input.py::test_invalid_events_rejected[data2] PASSED          [ 27%]
-tests/test_input.py::test_invalid_events_rejected[data3] PASSED          [ 28%]
-tests/test_input.py::test_invalid_events_rejected[data4] PASSED          [ 28%]
-tests/test_input.py::test_invalid_events_rejected[data5] PASSED          [ 29%]
-tests/test_input.py::test_invalid_events_rejected[data6] PASSED          [ 29%]
-tests/test_input.py::test_invalid_events_rejected[data7] PASSED          [ 30%]
-tests/test_input.py::test_invalid_events_rejected[data8] PASSED          [ 31%]
-tests/test_input.py::test_invalid_events_rejected[data9] PASSED          [ 31%]
-tests/test_input.py::test_invalid_events_rejected[data10] PASSED         [ 32%]
-tests/test_input.py::test_invalid_events_rejected[data11] PASSED         [ 32%]
-tests/test_input.py::test_invalid_events_rejected[data12] PASSED         [ 33%]
-tests/test_input.py::test_models_are_distinct_types PASSED               [ 34%]
-tests/test_input.py::test_null_backend_raises PASSED                     [ 34%]
-tests/test_input.py::test_wayland_warning PASSED                         [ 35%]
-tests/test_input.py::test_dispatcher_coalesces_stale_moves_and_keeps_order PASSED [ 35%]
-tests/test_input.py::test_dispatcher_survives_backend_errors PASSED      [ 36%]
-tests/test_input.py::test_ws_events_drive_backend PASSED                 [ 37%]
-tests/test_input.py::test_ws_bad_event_reports_error_and_keeps_going PASSED [ 37%]
-tests/test_input.py::test_ws_ping_pong PASSED                            [ 38%]
-tests/test_input.py::test_pause_blocks_events_and_notifies PASSED        [ 39%]
-tests/test_input.py::test_connect_disconnect_notifications PASSED        [ 39%]
-tests/test_security.py::test_health_is_open_and_minimal PASSED           [ 40%]
-tests/test_security.py::test_rejected_without_token[GET-/v1/pair/check] PASSED [ 40%]
-tests/test_security.py::test_rejected_without_token[GET-/v1/status] PASSED [ 41%]
-tests/test_security.py::test_rejected_without_token[POST-/v1/text] PASSED [ 42%]
-tests/test_security.py::test_rejected_without_token[POST-/v1/files?name=a.txt] PASSED [ 42%]
-tests/test_security.py::test_rejected_without_token[GET-/v1/inbox] PASSED [ 43%]
-tests/test_security.py::test_rejected_without_token[GET-/v1/history] PASSED [ 43%]
-tests/test_security.py::test_rejected_without_token[GET-/v1/inbox/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/file] PASSED [ 44%]
-tests/test_security.py::test_rejected_without_token[GET-/v1/commands] PASSED [ 45%]
-tests/test_security.py::test_rejected_without_token[POST-/v1/commands/x/run] PASSED [ 45%]
-tests/test_security.py::test_rejected_with_wrong_token[GET-/v1/pair/check] PASSED [ 46%]
-tests/test_security.py::test_rejected_with_wrong_token[GET-/v1/status] PASSED [ 46%]
-tests/test_security.py::test_rejected_with_wrong_token[POST-/v1/text] PASSED [ 47%]
-tests/test_security.py::test_rejected_with_wrong_token[POST-/v1/files?name=a.txt] PASSED [ 48%]
-tests/test_security.py::test_rejected_with_wrong_token[GET-/v1/inbox] PASSED [ 48%]
-tests/test_security.py::test_rejected_with_wrong_token[GET-/v1/history] PASSED [ 49%]
+tests/test_commands.py::test_shipped_example_is_valid_and_safe_by_default PASSED [ 16%]
+tests/test_commands.py::test_example_has_no_duplicate_ids_and_valid_risky_entries PASSED [ 17%]
+tests/test_commands.py::test_sync_adds_only_missing_and_keeps_user_edits PASSED [ 17%]
+tests/test_commands.py::test_sync_creates_missing_file_and_repairs_empty_commands PASSED [ 18%]
+tests/test_input.py::test_event_to_action_mapping[data0-expected0] PASSED [ 19%]
+tests/test_input.py::test_event_to_action_mapping[data1-expected1] PASSED [ 19%]
+tests/test_input.py::test_event_to_action_mapping[data2-expected2] PASSED [ 20%]
+tests/test_input.py::test_event_to_action_mapping[data3-expected3] PASSED [ 20%]
+tests/test_input.py::test_event_to_action_mapping[data4-expected4] PASSED [ 21%]
+tests/test_input.py::test_event_to_action_mapping[data5-expected5] PASSED [ 22%]
+tests/test_input.py::test_event_to_action_mapping[data6-expected6] PASSED [ 22%]
+tests/test_input.py::test_event_to_action_mapping[data7-expected7] PASSED [ 23%]
+tests/test_input.py::test_event_to_action_mapping[data8-expected8] PASSED [ 23%]
+tests/test_input.py::test_event_to_action_mapping[data9-expected9] PASSED [ 24%]
+tests/test_input.py::test_event_to_action_mapping[data10-expected10] PASSED [ 25%]
+tests/test_input.py::test_event_to_action_mapping[data11-expected11] PASSED [ 25%]
+tests/test_input.py::test_event_to_action_mapping[data12-expected12] PASSED [ 26%]
+tests/test_input.py::test_event_to_action_mapping[data13-expected13] PASSED [ 26%]
+tests/test_input.py::test_invalid_events_rejected[data0] PASSED          [ 27%]
+tests/test_input.py::test_invalid_events_rejected[data1] PASSED          [ 28%]
+tests/test_input.py::test_invalid_events_rejected[data2] PASSED          [ 28%]
+tests/test_input.py::test_invalid_events_rejected[data3] PASSED          [ 29%]
+tests/test_input.py::test_invalid_events_rejected[data4] PASSED          [ 29%]
+tests/test_input.py::test_invalid_events_rejected[data5] PASSED          [ 30%]
+tests/test_input.py::test_invalid_events_rejected[data6] PASSED          [ 31%]
+tests/test_input.py::test_invalid_events_rejected[data7] PASSED          [ 31%]
+tests/test_input.py::test_invalid_events_rejected[data8] PASSED          [ 32%]
+tests/test_input.py::test_invalid_events_rejected[data9] PASSED          [ 32%]
+tests/test_input.py::test_invalid_events_rejected[data10] PASSED         [ 33%]
+tests/test_input.py::test_invalid_events_rejected[data11] PASSED         [ 34%]
+tests/test_input.py::test_invalid_events_rejected[data12] PASSED         [ 34%]
+tests/test_input.py::test_models_are_distinct_types PASSED               [ 35%]
+tests/test_input.py::test_null_backend_raises PASSED                     [ 35%]
+tests/test_input.py::test_wayland_warning PASSED                         [ 36%]
+tests/test_input.py::test_dispatcher_coalesces_stale_moves_and_keeps_order PASSED [ 37%]
+tests/test_input.py::test_dispatcher_survives_backend_errors PASSED      [ 37%]
+tests/test_input.py::test_ws_events_drive_backend PASSED                 [ 38%]
+tests/test_input.py::test_ws_bad_event_reports_error_and_keeps_going PASSED [ 38%]
+tests/test_input.py::test_ws_ping_pong PASSED                            [ 39%]
+tests/test_input.py::test_pause_blocks_events_and_notifies PASSED        [ 40%]
+tests/test_input.py::test_connect_disconnect_notifications PASSED        [ 40%]
+tests/test_security.py::test_health_is_open_and_minimal PASSED           [ 41%]
+tests/test_security.py::test_rejected_without_token[GET-/v1/pair/check] PASSED [ 41%]
+tests/test_security.py::test_rejected_without_token[GET-/v1/status] PASSED [ 42%]
+tests/test_security.py::test_rejected_without_token[POST-/v1/text] PASSED [ 43%]
+tests/test_security.py::test_rejected_without_token[POST-/v1/files?name=a.txt] PASSED [ 43%]
+tests/test_security.py::test_rejected_without_token[GET-/v1/inbox] PASSED [ 44%]
+tests/test_security.py::test_rejected_without_token[GET-/v1/history] PASSED [ 44%]
+tests/test_security.py::test_rejected_without_token[GET-/v1/inbox/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/file] PASSED [ 45%]
+tests/test_security.py::test_rejected_without_token[GET-/v1/commands] PASSED [ 46%]
+tests/test_security.py::test_rejected_without_token[POST-/v1/commands/x/run] PASSED [ 46%]
+tests/test_security.py::test_rejected_with_wrong_token[GET-/v1/pair/check] PASSED [ 47%]
+tests/test_security.py::test_rejected_with_wrong_token[GET-/v1/status] PASSED [ 47%]
+tests/test_security.py::test_rejected_with_wrong_token[POST-/v1/text] PASSED [ 48%]
+tests/test_security.py::test_rejected_with_wrong_token[POST-/v1/files?name=a.txt] PASSED [ 49%]
+tests/test_security.py::test_rejected_with_wrong_token[GET-/v1/inbox] PASSED [ 49%]
+tests/test_security.py::test_rejected_with_wrong_token[GET-/v1/history] PASSED [ 50%]
 tests/test_security.py::test_rejected_with_wrong_token[GET-/v1/inbox/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/file] PASSED [ 50%]
-tests/test_security.py::test_rejected_with_wrong_token[GET-/v1/commands] PASSED [ 50%]
-tests/test_security.py::test_rejected_with_wrong_token[POST-/v1/commands/x/run] PASSED [ 51%]
-tests/test_security.py::test_token_in_query_string_is_not_accepted PASSED [ 51%]
-tests/test_security.py::test_valid_token_accepted PASSED                 [ 52%]
+tests/test_security.py::test_rejected_with_wrong_token[GET-/v1/commands] PASSED [ 51%]
+tests/test_security.py::test_rejected_with_wrong_token[POST-/v1/commands/x/run] PASSED [ 52%]
+tests/test_security.py::test_token_in_query_string_is_not_accepted PASSED [ 52%]
+tests/test_security.py::test_valid_token_accepted PASSED                 [ 53%]
 tests/test_security.py::test_status_reports_state PASSED                 [ 53%]
-tests/test_security.py::test_brute_force_gets_blocked PASSED             [ 53%]
-tests/test_security.py::test_openapi_and_docs_not_exposed PASSED         [ 54%]
-tests/test_security.py::test_websocket_rejects_without_token PASSED      [ 54%]
-tests/test_security.py::test_websocket_rejects_wrong_token PASSED        [ 55%]
+tests/test_security.py::test_brute_force_gets_blocked PASSED             [ 54%]
+tests/test_security.py::test_openapi_and_docs_not_exposed PASSED         [ 55%]
+tests/test_security.py::test_websocket_rejects_without_token PASSED      [ 55%]
+tests/test_security.py::test_websocket_rejects_wrong_token PASSED        [ 56%]
 tests/test_security.py::test_websocket_accepts_token_first_message PASSED [ 56%]
-tests/test_security.py::test_websocket_accepts_bearer_header PASSED      [ 56%]
-tests/test_security.py::test_rotate_token_invalidates_old_token PASSED   [ 57%]
-tests/test_security.py::test_rotate_token_disconnects_live_socket PASSED [ 57%]
-tests/test_security.py::test_token_store_is_private_and_constant_time PASSED [ 58%]
+tests/test_security.py::test_websocket_accepts_bearer_header PASSED      [ 57%]
+tests/test_security.py::test_rotate_token_invalidates_old_token PASSED   [ 58%]
+tests/test_security.py::test_rotate_token_disconnects_live_socket PASSED [ 58%]
+tests/test_security.py::test_token_store_is_private_and_constant_time PASSED [ 59%]
 tests/test_security.py::test_token_compare_uses_hmac PASSED              [ 59%]
-tests/test_security.py::test_rate_limiter_window PASSED                  [ 59%]
-tests/test_security.py::test_failure_tracker PASSED                      [ 60%]
-tests/test_security.py::test_http_rate_limit PASSED                      [ 60%]
-tests/test_security.py::test_json_body_limit PASSED                      [ 61%]
+tests/test_security.py::test_rate_limiter_window PASSED                  [ 60%]
+tests/test_security.py::test_failure_tracker PASSED                      [ 61%]
+tests/test_security.py::test_http_rate_limit PASSED                      [ 61%]
+tests/test_security.py::test_json_body_limit PASSED                      [ 62%]
 tests/test_security.py::test_text_over_max_rejected PASSED               [ 62%]
-tests/test_security.py::test_unknown_fields_rejected PASSED              [ 62%]
-tests/test_security.py::test_local_get_refuses_lan_clients[/local/] PASSED [ 63%]
+tests/test_security.py::test_unknown_fields_rejected PASSED              [ 63%]
+tests/test_security.py::test_local_get_refuses_lan_clients[/local/] PASSED [ 64%]
 tests/test_security.py::test_local_get_refuses_lan_clients[/local/state] PASSED [ 64%]
-tests/test_security.py::test_local_get_refuses_lan_clients[/local/pair.svg] PASSED [ 64%]
+tests/test_security.py::test_local_get_refuses_lan_clients[/local/pair.svg] PASSED [ 65%]
 tests/test_security.py::test_local_post_refuses_lan_clients_even_with_header PASSED [ 65%]
-tests/test_security.py::test_local_post_needs_custom_header PASSED       [ 65%]
-tests/test_security.py::test_local_rejects_rebinding_host PASSED         [ 66%]
+tests/test_security.py::test_local_post_needs_custom_header PASSED       [ 66%]
+tests/test_security.py::test_local_rejects_rebinding_host PASSED         [ 67%]
 tests/test_security.py::test_local_page_and_qr PASSED                    [ 67%]
-tests/test_text_files.py::test_phone_text_copies_notifies_and_records PASSED [ 67%]
+tests/test_text_files.py::test_phone_text_copies_notifies_and_records PASSED [ 68%]
 tests/test_text_files.py::test_phone_text_without_clipboard PASSED       [ 68%]
-tests/test_text_files.py::test_laptop_text_reaches_inbox_and_live_socket PASSED [ 68%]
-tests/test_text_files.py::test_history_survives_restart PASSED           [ 69%]
+tests/test_text_files.py::test_laptop_text_reaches_inbox_and_live_socket PASSED [ 69%]
+tests/test_text_files.py::test_history_survives_restart PASSED           [ 70%]
 tests/test_text_files.py::test_sanitize_yields_single_safe_component[../../etc/passwd] PASSED [ 70%]
-tests/test_text_files.py::test_sanitize_yields_single_safe_component[..\\..\\windows\\system32\\evil.dll] PASSED [ 70%]
+tests/test_text_files.py::test_sanitize_yields_single_safe_component[..\\..\\windows\\system32\\evil.dll] PASSED [ 71%]
 tests/test_text_files.py::test_sanitize_yields_single_safe_component[/etc/cron.d/job] PASSED [ 71%]
-tests/test_text_files.py::test_sanitize_yields_single_safe_component[a/b/c.txt] PASSED [ 71%]
-tests/test_text_files.py::test_sanitize_yields_single_safe_component[....//....//x] PASSED [ 72%]
+tests/test_text_files.py::test_sanitize_yields_single_safe_component[a/b/c.txt] PASSED [ 72%]
+tests/test_text_files.py::test_sanitize_yields_single_safe_component[....//....//x] PASSED [ 73%]
 tests/test_text_files.py::test_sanitize_yields_single_safe_component[%2e%2e%2fsecret] PASSED [ 73%]
-tests/test_text_files.py::test_sanitize_yields_single_safe_component[..] PASSED [ 73%]
+tests/test_text_files.py::test_sanitize_yields_single_safe_component[..] PASSED [ 74%]
 tests/test_text_files.py::test_sanitize_yields_single_safe_component[.] PASSED [ 74%]
 tests/test_text_files.py::test_sanitize_yields_single_safe_component[] PASSED [ 75%]
-tests/test_text_files.py::test_sanitize_yields_single_safe_component[None] PASSED [ 75%]
+tests/test_text_files.py::test_sanitize_yields_single_safe_component[None] PASSED [ 76%]
 tests/test_text_files.py::test_sanitize_yields_single_safe_component[...] PASSED [ 76%]
-tests/test_text_files.py::test_sanitize_yields_single_safe_component[.bashrc] PASSED [ 76%]
+tests/test_text_files.py::test_sanitize_yields_single_safe_component[.bashrc] PASSED [ 77%]
 tests/test_text_files.py::test_sanitize_yields_single_safe_component[name\x00.txt] PASSED [ 77%]
 tests/test_text_files.py::test_sanitize_yields_single_safe_component[evil\n.sh] PASSED [ 78%]
-tests/test_text_files.py::test_sanitize_yields_single_safe_component[C:\\Users\\x\\f.txt] PASSED [ 78%]
+tests/test_text_files.py::test_sanitize_yields_single_safe_component[C:\\Users\\x\\f.txt] PASSED [ 79%]
 tests/test_text_files.py::test_sanitize_yields_single_safe_component[xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.txt] PASSED [ 79%]
-tests/test_text_files.py::test_sanitize_yields_single_safe_component[ . ] PASSED [ 79%]
+tests/test_text_files.py::test_sanitize_yields_single_safe_component[ . ] PASSED [ 80%]
 tests/test_text_files.py::test_sanitize_keeps_normal_names PASSED        [ 80%]
 tests/test_text_files.py::test_reserve_never_overwrites PASSED           [ 81%]
-tests/test_text_files.py::test_reserve_refuses_symlink_target PASSED     [ 81%]
+tests/test_text_files.py::test_reserve_refuses_symlink_target PASSED     [ 82%]
 tests/test_text_files.py::test_upload_saves_to_inbox PASSED              [ 82%]
-tests/test_text_files.py::test_upload_traversal_name_stays_in_inbox PASSED [ 82%]
+tests/test_text_files.py::test_upload_traversal_name_stays_in_inbox PASSED [ 83%]
 tests/test_text_files.py::test_upload_twice_does_not_overwrite PASSED    [ 83%]
 tests/test_text_files.py::test_upload_over_limit_rejected_and_cleaned PASSED [ 84%]
-tests/test_text_files.py::test_upload_chunked_over_limit_rejected_and_cleaned PASSED [ 84%]
+tests/test_text_files.py::test_upload_chunked_over_limit_rejected_and_cleaned PASSED [ 85%]
 tests/test_text_files.py::test_laptop_file_download_roundtrip PASSED     [ 85%]
-tests/test_text_files.py::test_download_rejects_non_ids[../../etc/passwd] PASSED [ 85%]
+tests/test_text_files.py::test_download_rejects_non_ids[../../etc/passwd] PASSED [ 86%]
 tests/test_text_files.py::test_download_rejects_non_ids[..%2f..%2fetc%2fpasswd] PASSED [ 86%]
 tests/test_text_files.py::test_download_rejects_non_ids[xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx] PASSED [ 87%]
-tests/test_text_files.py::test_download_rejects_non_ids[AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA] PASSED [ 87%]
+tests/test_text_files.py::test_download_rejects_non_ids[AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA] PASSED [ 88%]
 tests/test_text_files.py::test_cannot_download_files_phone_uploaded PASSED [ 88%]
 tests/test_text_files.py::test_send_file_over_limit PASSED               [ 89%]
 tests/test_x11_integration.py::test_move_is_relative[pynput] PASSED      [ 89%]
 tests/test_x11_integration.py::test_move_is_relative[xdotool] PASSED     [ 90%]
-tests/test_x11_integration.py::test_clicks[pynput] PASSED                [ 90%]
+tests/test_x11_integration.py::test_clicks[pynput] PASSED                [ 91%]
 tests/test_x11_integration.py::test_clicks[xdotool] PASSED               [ 91%]
 tests/test_x11_integration.py::test_press_and_release_for_drag[pynput] PASSED [ 92%]
 tests/test_x11_integration.py::test_press_and_release_for_drag[xdotool] PASSED [ 92%]
 tests/test_x11_integration.py::test_scroll_direction[pynput] PASSED      [ 93%]
-tests/test_x11_integration.py::test_scroll_direction[xdotool] PASSED     [ 93%]
+tests/test_x11_integration.py::test_scroll_direction[xdotool] PASSED     [ 94%]
 tests/test_x11_integration.py::test_slide_and_editing_keys[pynput] PASSED [ 94%]
 tests/test_x11_integration.py::test_slide_and_editing_keys[xdotool] PASSED [ 95%]
 tests/test_x11_integration.py::test_type_text[pynput] PASSED             [ 95%]
 tests/test_x11_integration.py::test_type_text[xdotool] PASSED            [ 96%]
-tests/test_x11_integration.py::test_type_text_with_capitals_uses_shift[pynput] PASSED [ 96%]
+tests/test_x11_integration.py::test_type_text_with_capitals_uses_shift[pynput] PASSED [ 97%]
 tests/test_x11_integration.py::test_type_text_with_capitals_uses_shift[xdotool] PASSED [ 97%]
 tests/test_x11_integration.py::test_media_keys_reach_the_server PASSED   [ 98%]
 tests/test_x11_integration.py::test_create_backend_picks_pynput_on_x11 PASSED [ 98%]
@@ -184,12 +187,12 @@ tests/test_x11_integration.py::test_clipboard_roundtrip PASSED           [ 99%]
 tests/test_x11_integration.py::test_whole_stack_ws_to_real_x_server PASSED [100%]
 
 ============================= slowest 5 durations ==============================
-1.11s call     tests/test_x11_integration.py::test_media_keys_reach_the_server
+1.09s call     tests/test_x11_integration.py::test_media_keys_reach_the_server
 1.01s call     tests/test_commands.py::test_timeout_kills_process
 0.84s call     tests/test_x11_integration.py::test_scroll_direction[xdotool]
 0.72s call     tests/test_x11_integration.py::test_clicks[xdotool]
-0.53s call     tests/test_x11_integration.py::test_whole_stack_ws_to_real_x_server
-============================= 164 passed in 15.56s =============================
+0.52s call     tests/test_x11_integration.py::test_whole_stack_ws_to_real_x_server
+============================= 167 passed in 15.43s =============================
 [exit code 0]
 
 ################ APP ################
@@ -202,113 +205,115 @@ $ npm run typecheck --silent
 
 $ npx jest --ci --verbose
 PASS __tests__/store.test.ts
-  ✓ starts unpaired when nothing is stored (7 ms)
-  ✓ pairing verifies the token before saving it (3 ms)
-  ✓ pairs, stores credentials, connects and loads the inbox (8 ms)
-  ✓ live inbox messages are merged without duplicates; pause state follows the laptop (1 ms)
-  ✓ goes offline when the socket drops and marks auth failures (1 ms)
-  ✓ refresh reports an unreachable laptop instead of throwing (1 ms)
-  ✓ unpair wipes credentials and state (1 ms)
-  ✓ sendEvent goes through the socket and fails soft when there is none (1 ms)
+  ✓ starts unpaired when nothing is stored (23 ms)
+  ✓ pairing verifies the token before saving it (7 ms)
+  ✓ pairs, stores credentials, connects and loads the inbox (12 ms)
+  ✓ live inbox messages are merged without duplicates; pause state follows the laptop (3 ms)
+  ✓ goes offline when the socket drops and marks auth failures (30 ms)
+  ✓ refresh reports an unreachable laptop instead of throwing (4 ms)
+  ✓ unpair wipes credentials and state (4 ms)
+  ✓ sendEvent goes through the socket and fails soft when there is none (2 ms)
 
 PASS __tests__/pairing.test.ts
   ✓ builds urls
   parsePairing
-    ✓ parses the agent QR payload (1 ms)
+    ✓ parses the agent QR payload (2 ms)
     ✓ accepts hostnames and trims whitespace (1 ms)
     ✓ rejects not a url
-    ✓ rejects wrong scheme
+    ✓ rejects wrong scheme (1 ms)
     ✓ rejects no query
-    ✓ rejects missing token (1 ms)
-    ✓ rejects short token
+    ✓ rejects missing token
+    ✓ rejects short token (1 ms)
     ✓ rejects bad port
     ✓ rejects non numeric port
     ✓ rejects host with path
     ✓ rejects host with space (1 ms)
     ✓ rejects token with symbols
-    ✓ rejects bad percent encoding
+    ✓ rejects bad percent encoding (1 ms)
   validatePairing
     ✓ works with string params from the router
   normalizeBaseUrl
     ✓ 192.168.1.20:8765 (1 ms)
-    ✓ http://laptop.ts.net:8765/
+    ✓ http://laptop.ts.net:8765/ (1 ms)
     ✓   HTTP://10.0.0.1:1  
     ✓ [fd7a::1]:8765 (1 ms)
     ✓ rejects ""
-    ✓ rejects "ftp://x" (1 ms)
+    ✓ rejects "ftp://x"
     ✓ rejects "http://a b"
-    ✓ rejects "http://x:99999"
+    ✓ rejects "http://x:99999" (1 ms)
     ✓ rejects "http://host/path"
-    ✓ rejects "javascript:alert(1)" (1 ms)
+    ✓ rejects "javascript:alert(1)"
 
 PASS __tests__/api.test.ts
   ApiClient
-    ✓ sends the bearer token on every request and never in the URL (2 ms)
+    ✓ sends the bearer token on every request and never in the URL (1 ms)
     ✓ posts JSON for text (1 ms)
-    ✓ runs commands by id only, with no command text in the request (1 ms)
-    ✓ url-encodes ids and file names
-    ✓ maps HTTP 401 to auth (1 ms)
-    ✓ maps HTTP 429 to rate_limited
-    ✓ maps HTTP 423 to paused (1 ms)
+    ✓ runs commands by id only, with no command text in the request
+    ✓ url-encodes ids and file names (1 ms)
+    ✓ maps HTTP 401 to auth
+    ✓ maps HTTP 429 to rate_limited (1 ms)
+    ✓ maps HTTP 423 to paused
     ✓ maps HTTP 413 to too_large
     ✓ maps HTTP 404 to not_found (1 ms)
     ✓ maps HTTP 500 to http
-    ✓ maps confirmation_required (1 ms)
+    ✓ maps confirmation_required
     ✓ maps a dead network to a friendly error (1 ms)
     ✓ times out hung requests (3 ms)
   errors
     ✓ describes every kind with something useful
 
 PASS __tests__/socket.test.ts
-  ✓ connects, authenticates with the token in the first message (not the URL) (2 ms)
+  ✓ connects, authenticates with the token in the first message (not the URL) (4 ms)
   ✓ reconnects with exponential backoff and resets after success (3 ms)
-  ✓ does not retry when the laptop rejects the token (4401) (1 ms)
-  ✓ stop() cancels pending reconnects (1 ms)
+  ✓ does not retry when the laptop rejects the token (4401)
+  ✓ stop() cancels pending reconnects
   ✓ reconnectNow skips the backoff wait (1 ms)
   ✓ detects a silent laptop via missed heartbeats and reconnects (1 ms)
-  ✓ forwards server messages and ignores garbage (1 ms)
+  ✓ forwards server messages and ignores garbage
 
 PASS __tests__/screens.test.tsx
   Commands screen
-    ✓ lists commands and runs one by id (385 ms)
-    ✓ asks before running a confirm command, and only then sends confirmed:true (51 ms)
-    ✓ shows a clear error when the laptop is paused (23 ms)
-    ✓ shows an empty state with instructions (4 ms)
-    ✓ shows an error state with retry when the laptop is unreachable (8 ms)
+    ✓ lists commands and runs one by id (877 ms)
+    ✓ asks before running a confirm command, and only then sends confirmed:true (35 ms)
+    ✓ shows a clear error when the laptop is paused (27 ms)
+    ✓ shows an empty state with instructions (7 ms)
+    ✓ shows an error state with retry when the laptop is unreachable (10 ms)
   Inbox screen
-    ✓ shows the pairing prompt when unpaired (7 ms)
-    ✓ shows how to send something when the inbox is empty (3 ms)
-    ✓ shows items newest first with a Copy button for text (22 ms)
+    ✓ shows the pairing prompt when unpaired (213 ms)
+    ✓ shows how to send something when the inbox is empty (5 ms)
+    ✓ shows items newest first with a Copy button for text (73 ms)
   connection banner
-    ✓ unpaired (1 ms)
+    ✓ unpaired (2 ms)
     ✓ offline
     ✓ auth_failed (1 ms)
-    ✓ connected
+    ✓ connected (1 ms)
     ✓ is hidden when everything is fine
   sending files
     ✓ refuses files above the laptop limit before uploading (2 ms)
-    ✓ formats sizes
+    ✓ formats sizes (2 ms)
 
 PASS __tests__/remote.test.tsx
   DeltaBatcher
-    ✓ emits at most ~60 Hz and sums deltas (23 ms)
-    ✓ keeps sub-pixel remainders instead of losing them (8 ms)
+    ✓ emits at most ~60 Hz and sums deltas (14 ms)
+    ✓ keeps sub-pixel remainders instead of losing them (3 ms)
     ✓ stops ticking when idle (2 ms)
   pointer maths
     ✓ accelerates fast movement more than slow movement (1 ms)
-    ✓ converts scroll distance into notches (1 ms)
+    ✓ converts scroll distance into notches (2 ms)
   TrackpadController
     ✓ maps gestures to events (3 ms)
   Remote buttons
-    ✓ slide buttons send the right keys (44 ms)
-    ✓ media buttons send media actions (13 ms)
-    ✓ keyboard sends text and special keys (22 ms)
-    ✓ does nothing while disabled (paused / offline) (5 ms)
+    ✓ opens on Shorts: next/previous use arrow keys, scroll buttons use the wheel (56 ms)
+    ✓ slide buttons send the right keys (19 ms)
+    ✓ media buttons send media actions (14 ms)
+    ✓ live typing sends each key at once and clears the box (23 ms)
+    ✓ batch mode still types the whole box on demand (35 ms)
+    ✓ does nothing while disabled (paused / offline) (7 ms)
 
 Test Suites: 6 passed, 6 total
-Tests:       79 passed, 79 total
+Tests:       81 passed, 81 total
 Snapshots:   0 total
-Time:        1.546 s, estimated 2 s
+Time:        4.1 s
 Ran all test suites.
 [exit code 0]
 

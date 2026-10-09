@@ -10,15 +10,16 @@ Written honestly; "verified" means I ran it and saw the output in `TEST_OUTPUT.t
 | Agent over a real socket | `golesync serve` + curl + the real CLI + a real `websockets` client (found a real bug: uvicorn had no WebSocket library) | worked after fix |
 | Mouse, clicks, drag, scroll, slide keys, typing, media keys, clipboard | pynput **and** xdotool backends, and the whole WS->agent->pynput path, against a real **Xvfb** X server (18 tests, `test_x11_integration.py`); `xclip` round trip | pass |
 | `install.sh` | run with a fake `HOME` and a stub `systemctl` | created venv, links, unit file, config, token |
-| App logic | 79 Jest tests: pairing parser, API client (errors/timeouts), WebSocket reconnect/backoff/auth/dead-link, store, trackpad batching, Remote buttons, Commands/Inbox screens | pass |
+| App logic | 81 Jest tests: pairing parser, API client (errors/timeouts), WebSocket reconnect/backoff/auth/dead-link, store, trackpad batching, Remote buttons, Commands/Inbox screens | pass |
 | App static checks | `tsc --noEmit` strict, ESLint `--max-warnings=0` | clean |
+| Release APK |  built by GitHub Actions, signed with the owner's keystore, installed and run on a phone | works |
 | Android project generation | `expo prebuild --platform android`; inspected the generated manifest: package id, cleartext, camera, no RECORD_AUDIO, SEND/SEND_MULTIPLE intent filters, adaptive icon, splash colour | correct |
 
 ## NOT verified (needs your phone / desktop / GitHub)
 
-1. **No APK was built.** The Android SDK download is blocked in my sandbox, so `./gradlew assembleRelease`, the `apksigner` signing step and the `release.yml` workflow have never run. `ci.yml` is also unproven until it runs on GitHub. Expect to fix small things on the first tag.
-2. **Nothing was run on a real phone.** Untested: camera QR scan, the share sheet target (`expo-share-intent`), the document picker, real upload/download progress (`expo-file-system` is mocked in Jest), SecureStore, haptics, keep-awake, React Native's WebSocket on Android, cleartext HTTP on a device, the Android 13+ behaviours of any of these.
-3. **Trackpad feel is unproven.** The gesture composition (tap vs. two-finger tap vs. scroll vs. long-press-drag vs. move, via `Gesture.Race`) and the acceleration/scroll constants are my best guess; only the event mapping and batching are tested. Expect to tune `pointer.ts` and the long-press delay.
+1. **Release pipeline: proven.** Tags `v0.1.0` to `v0.1.4` built, signed and published APKs through `release.yml` on GitHub (the keystore secrets were checked by a temporary workflow). `ci.yml` passes on GitHub. I could not build an APK in my own sandbox (Android SDK download blocked), so this was verified only through GitHub's runners.
+2. **Real phone: partly proven.** The owner installed the APK over a previous install, paired, sent phone-to-laptop, and used the Shorts tab successfully. Still unconfirmed: the share-sheet target, file download from the laptop, camera-scan edge cases, haptics, keep-awake, live-typing latency, and the app-launcher/desktop commands on the owner's laptop.
+3. **Trackpad feel is not reported on yet.** The gesture composition (tap vs. two-finger tap vs. scroll vs. long-press-drag vs. move, via `Gesture.Race`) and the acceleration/scroll constants are my best guess; only the event mapping and batching are tested. Expect to tune `pointer.ts` and the long-press delay.
 4. **Xvfb has no window manager or desktop.** I proved the agent produces the right X events (key, button, motion) but not that GNOME, LibreOffice or your media player reacts to them (media keys in particular depend on the desktop).
 5. **`notify-send` and the systemd unit** were not exercised on a real session. Notifications are tested via a fake; `DISPLAY`/`XAUTHORITY` hand-off to the user service is documented but untried.
 6. **Wayland** is only detected (environment variables) and warned about; no Wayland session was available.

@@ -198,6 +198,24 @@ def init() -> None:
     typer.echo(f"config: {s.config_dir}\ncommands: {dest}")
 
 
+@app.command("commands-sync")
+def commands_sync() -> None:
+    """Add any new example commands to your commands.yaml (your own edits are kept)."""
+    from .commands import sync_example
+
+    s = _settings()
+    example = Path(__file__).with_name("commands.example.yaml")
+    try:
+        added = sync_example(s.commands_path, example)
+    except ValueError as e:
+        typer.secho(str(e), fg="red", err=True)
+        raise typer.Exit(1) from e
+    if added:
+        typer.echo(f"Added {len(added)} command(s) to {s.commands_path}:\n  " + "\n  ".join(added))
+    else:
+        typer.echo("commands.yaml already has every example command.")
+
+
 @app.command()
 def version() -> None:
     """Print the version."""

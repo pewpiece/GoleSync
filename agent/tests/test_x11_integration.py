@@ -91,8 +91,11 @@ def window(xserver):
     w = W()
     w.drain()
     yield w
-    win.destroy()
-    d.close()
+    try:  # the X connection can already be gone when pynput controllers are collected
+        win.destroy()
+        d.close()
+    except Exception:  # noqa: BLE001
+        pass
 
 
 def pointer() -> tuple[int, int]:

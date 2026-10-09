@@ -89,9 +89,27 @@ describe('TrackpadController', () => {
 });
 
 describe('Remote buttons', () => {
+  it('opens on Shorts: next/previous use arrow keys, scroll buttons use the wheel', async () => {
+    const send = jest.fn();
+    await render(<Remote send={send} />);
+    await fireEvent.press(screen.getByLabelText('\u25BC  Next'));
+    await fireEvent.press(screen.getByLabelText('\u25B2  Previous'));
+    await fireEvent.press(screen.getByLabelText('Scroll down'));
+    await fireEvent.press(screen.getByLabelText('Scroll up'));
+    await fireEvent.press(screen.getByLabelText('Play / Pause'));
+    expect(send.mock.calls.map((c) => c[0])).toEqual([
+      { type: 'key', key: 'down' },
+      { type: 'key', key: 'up' },
+      { type: 'scroll', dx: 0, dy: 1 },
+      { type: 'scroll', dx: 0, dy: -1 },
+      { type: 'key', key: 'space' },
+    ]);
+  });
+
   it('slide buttons send the right keys', async () => {
     const send = jest.fn();
     await render(<Remote send={send} />);
+    await fireEvent.press(screen.getByText('Slides'));
     await fireEvent.press(screen.getByLabelText('Next'));
     await fireEvent.press(screen.getByLabelText('Previous'));
     await fireEvent.press(screen.getByLabelText('Start (F5)'));
@@ -110,25 +128,39 @@ describe('Remote buttons', () => {
     expect(send.mock.calls.map((c) => c[0].action)).toEqual(['play_pause', 'next', 'previous', 'volume_up', 'mute', 'volume_down']);
   });
 
-  it('keyboard sends text and special keys', async () => {
+  it('live typing sends each key at once and clears the box', async () => {
     const send = jest.fn();
     await render(<Remote send={send} />);
     await fireEvent.press(screen.getByText('Keys'));
-    await fireEvent.changeText(screen.getByLabelText('Text to type on laptop'), 'hello');
-    await fireEvent.press(screen.getByLabelText('Type on laptop'));
-    await fireEvent.press(screen.getByLabelText('Backspace'));
-    await fireEvent.press(screen.getByLabelText('Enter'));
+    const box = screen.getByLabelText('Text to type on laptop');
+    await fireEvent.changeText(box, 'h');
+    await fireEvent(box, 'keyPress', { nativeEvent: { key: 'Backspace' } });
+    await fireEvent(box, 'submitEditing');
+    await fireEvent.press(screen.getByLabelText('Tab'));
     expect(send.mock.calls.map((c) => c[0])).toEqual([
-      { type: 'text', text: 'hello' },
+      { type: 'text', text: 'h' },
       { type: 'key', key: 'backspace' },
       { type: 'key', key: 'enter' },
+      { type: 'key', key: 'tab' },
     ]);
+    expect(box.props.value).toBe('');
+  });
+
+  it('batch mode still types the whole box on demand', async () => {
+    const send = jest.fn();
+    await render(<Remote send={send} />);
+    await fireEvent.press(screen.getByText('Keys'));
+    await fireEvent.press(screen.getByLabelText('Live typing: ON'));
+    await fireEvent.changeText(screen.getByLabelText('Text to type on laptop'), 'hello');
+    expect(send).not.toHaveBeenCalled();
+    await fireEvent.press(screen.getByLabelText('Type on laptop'));
+    expect(send).toHaveBeenCalledWith({ type: 'text', text: 'hello' });
   });
 
   it('does nothing while disabled (paused / offline)', async () => {
     const send = jest.fn();
     await render(<Remote send={send} disabled />);
-    await fireEvent.press(screen.getByLabelText('Next'));
+    await fireEvent.press(screen.getByLabelText('\u25BC  Next'));
     expect(send).not.toHaveBeenCalled();
   });
 });

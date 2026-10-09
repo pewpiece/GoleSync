@@ -6,7 +6,7 @@ no accounts.
 * **Text & clipboard push, both ways.** Share a link from any Android app to the laptop's
   clipboard; send text or links from the laptop to the phone's Inbox.
 * **File drop, both ways.** Phone files land in `~/GoleSync/Inbox`; laptop files appear in the phone's Inbox with progress.
-* **Phone as remote control.** Slide clicker, media keys, trackpad (move, click, right-click, scroll, drag), keyboard.
+* **Phone as remote control.** A Shorts/Reels screen (next/previous with arrow keys, mouse-wheel scroll, play/pause), slide clicker, media keys, trackpad (move, click, right-click, scroll, drag), and a keyboard with Live typing (each key goes to the laptop as you press it).
 * **Command buttons.** Run allow-listed commands from `commands.yaml` by id, with a confirm prompt.
 
 ```
@@ -91,8 +91,7 @@ commands:
     detach: true                     # start and return immediately
 ```
 
-No restart needed: the file is re-read for every request. `enabled: false` hides an entry. The
-shipped example only enables "Lock screen". Need pipes or `&&`? Put them in a script you
+No restart needed: the file is re-read for every request. `enabled: false` hides an entry. shipped example enables a set of harmless buttons: lock/screen off, desktop switching, window tiling, editing and browser shortcuts, battery/disk/uptime info, one-tap app launchers (Brave, Chromium, Terminal, VS Code, Slack, Postman, Files) and folder/site openers. Anything risky (suspend, close window, Wi-Fi off, empty trash) is off and asks for confirmation. Launchers use the usual command names, so if one fails run `which <name>` and edit its `command`. To pick up new example commands without losing your edits, run `golesync commands-sync` (it only appends commands whose id you don't have yet). Need pipes or `&&`? Put them in a script you
 own and allow-list `["~/bin/my-script.sh"]`.
 
 ## 2. Phone (Android)

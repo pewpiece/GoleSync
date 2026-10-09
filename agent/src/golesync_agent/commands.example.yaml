@@ -7,10 +7,185 @@
 # Fields: id (a-z 0-9 _ -), label, command (argv list), cwd (optional), confirm (ask on the
 # phone first), enabled (default true), timeout (seconds, default 60, max 600),
 # detach (start and return at once; for long-running things like a dev server).
+#
+# The first group is enabled and harmless (needs an X11 session; `xdotool` and `xset` are
+# standard). Everything under "Disabled until you opt in" is hidden until you set enabled: true.
 commands:
+  # --- Desktop ---------------------------------------------------------------------------
   - id: lock-screen
     label: Lock screen
     command: ["loginctl", "lock-session"]
+
+  - id: screen-off
+    label: Screen off
+    command: ["xset", "dpms", "force", "off"]
+
+  - id: workspace-next
+    label: Next desktop
+    command: ["xdotool", "key", "ctrl+alt+Right"]    # use ctrl+alt+Down if your desktops are vertical
+
+  - id: workspace-prev
+    label: Previous desktop
+    command: ["xdotool", "key", "ctrl+alt+Left"]
+
+  - id: overview
+    label: Overview (Super)
+    command: ["xdotool", "key", "super"]
+
+  - id: show-desktop
+    label: Show desktop
+    command: ["xdotool", "key", "super+d"]
+
+  - id: switch-window
+    label: Switch window (Alt+Tab)
+    command: ["xdotool", "key", "alt+Tab"]
+
+  - id: screenshot
+    label: Screenshot
+    command: ["xdotool", "key", "Print"]
+
+  # --- Editing shortcuts (the phone Keys screen has no chords) ---------------------------
+  - id: select-all
+    label: Select all (Ctrl+A)
+    command: ["xdotool", "key", "ctrl+a"]
+
+  - id: undo
+    label: Undo (Ctrl+Z)
+    command: ["xdotool", "key", "ctrl+z"]
+
+  - id: save
+    label: Save (Ctrl+S)
+    command: ["xdotool", "key", "ctrl+s"]
+
+  - id: find
+    label: Find (Ctrl+F)
+    command: ["xdotool", "key", "ctrl+f"]
+
+  # --- Browser ---------------------------------------------------------------------------
+  - id: browser-new-tab
+    label: New tab
+    command: ["xdotool", "key", "ctrl+t"]
+
+  - id: browser-close-tab
+    label: Close tab
+    command: ["xdotool", "key", "ctrl+w"]
+    confirm: true
+
+  - id: browser-reload
+    label: Reload page
+    command: ["xdotool", "key", "ctrl+r"]
+
+  - id: browser-back
+    label: Back
+    command: ["xdotool", "key", "alt+Left"]
+
+  - id: browser-forward
+    label: Forward
+    command: ["xdotool", "key", "alt+Right"]
+
+  - id: fullscreen
+    label: Fullscreen (F11)
+    command: ["xdotool", "key", "F11"]
+
+  - id: zoom-in
+    label: Zoom in
+    command: ["xdotool", "key", "ctrl+plus"]
+
+  - id: zoom-out
+    label: Zoom out
+    command: ["xdotool", "key", "ctrl+minus"]
+
+  # --- Windows ---------------------------------------------------------------------------
+  - id: maximize
+    label: Maximize window
+    command: ["xdotool", "key", "super+Up"]
+
+  - id: tile-left
+    label: Tile window left
+    command: ["xdotool", "key", "super+Left"]
+
+  - id: tile-right
+    label: Tile window right
+    command: ["xdotool", "key", "super+Right"]
+
+  # --- Info (output is shown on the phone) -----------------------------------------------
+
+  - id: battery
+    label: Battery %
+    command: ["cat", "/sys/class/power_supply/BAT0/capacity"]
+
+  - id: disk-free
+    label: Disk space
+    command: ["df", "-h", "/", "/home"]
+
+  - id: uptime
+    label: Uptime and load
+    command: ["uptime"]
+
+  - id: ip-address
+    label: IP addresses
+    command: ["hostname", "-I"]
+
+  # --- Apps (one button each; they start the app and return at once) ---------------------
+  # If a button reports "failed to start", find the real command with `which <name>` and edit it.
+  - id: app-brave
+    label: Brave
+    command: ["brave-browser"]
+    detach: true
+
+  - id: app-chromium
+    label: Chromium
+    command: ["chromium"]            # snap/apt name; try "chromium-browser" if this fails
+    detach: true
+
+  - id: app-terminal
+    label: Terminal
+    command: ["x-terminal-emulator"]
+    detach: true
+
+  - id: app-vscode
+    label: VS Code
+    command: ["code"]
+    detach: true
+
+  - id: app-slack
+    label: Slack
+    command: ["slack"]
+    detach: true
+
+  - id: app-postman
+    label: Postman
+    command: ["postman"]             # snap installs it as /snap/bin/postman
+    detach: true
+
+  - id: app-files
+    label: Files
+    command: ["nautilus"]
+    detach: true
+
+  # --- Open folders and sites ------------------------------------------------------------
+  - id: open-shorts
+    label: Open YouTube Shorts
+    command: ["xdg-open", "https://www.youtube.com/shorts"]
+
+  - id: open-inbox
+    label: Open GoleSync Inbox folder
+    command: ["xdg-open", "~/GoleSync/Inbox"]
+
+  - id: open-downloads
+    label: Open Downloads
+    command: ["xdg-open", "~/Downloads"]
+
+  - id: open-youtube
+    label: Open YouTube
+    command: ["xdg-open", "https://www.youtube.com"]
+
+  # --- Disabled until you opt in ---------------------------------------------------------
+  - id: close-window
+    label: Close window (Alt+F4)
+    command: ["xdotool", "key", "alt+F4"]
+    confirm: true
+    enabled: false
 
   - id: dev-server
     label: Start dev server
@@ -36,5 +211,32 @@ commands:
   - id: suspend
     label: Suspend laptop
     command: ["systemctl", "suspend"]
+    confirm: true
+    enabled: false
+
+  - id: wifi-off
+    label: Wi-Fi off (you will lose the phone link!)
+    command: ["nmcli", "radio", "wifi", "off"]
+    confirm: true
+    enabled: false
+
+  - id: wifi-on
+    label: Wi-Fi on
+    command: ["nmcli", "radio", "wifi", "on"]
+    enabled: false
+
+  - id: brightness-up
+    label: Brightness +10% (needs brightnessctl)
+    command: ["brightnessctl", "set", "+10%"]
+    enabled: false
+
+  - id: brightness-down
+    label: Brightness -10% (needs brightnessctl)
+    command: ["brightnessctl", "set", "10%-"]
+    enabled: false
+
+  - id: empty-trash
+    label: Empty trash
+    command: ["gio", "trash", "--empty"]
     confirm: true
     enabled: false

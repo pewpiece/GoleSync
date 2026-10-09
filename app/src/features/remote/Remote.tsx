@@ -6,9 +6,10 @@ import { colors, spacing } from '../../theme';
 import { Trackpad } from './Trackpad';
 
 type Send = (ev: object) => unknown;
-export type Mode = 'slides' | 'media' | 'pad' | 'keys';
+export type Mode = 'shorts' | 'slides' | 'media' | 'pad' | 'keys';
 
 const MODES: { id: Mode; label: string }[] = [
+  { id: 'shorts', label: 'Shorts' },
   { id: 'slides', label: 'Slides' },
   { id: 'media', label: 'Media' },
   { id: 'pad', label: 'Trackpad' },
@@ -19,7 +20,7 @@ const key = (k: string) => ({ type: 'key', key: k });
 const media = (a: string) => ({ type: 'media', action: a });
 
 export function Remote({ send, disabled }: { send: Send; disabled?: boolean }) {
-  const [mode, setMode] = useState<Mode>('slides');
+  const [mode, setMode] = useState<Mode>('shorts');
   return (
     <View style={styles.root}>
       <View style={styles.seg}>
@@ -35,6 +36,7 @@ export function Remote({ send, disabled }: { send: Send; disabled?: boolean }) {
           </Text>
         ))}
       </View>
+      {mode === 'shorts' ? <Shorts send={send} disabled={disabled} /> : null}
       {mode === 'slides' ? <Slides send={send} disabled={disabled} /> : null}
       {mode === 'media' ? <Media send={send} disabled={disabled} /> : null}
       {mode === 'pad' ? <Pad send={send} disabled={disabled} /> : null}
@@ -44,6 +46,25 @@ export function Remote({ send, disabled }: { send: Send; disabled?: boolean }) {
 }
 
 type PanelProps = { send: Send; disabled?: boolean };
+
+/** Scrolling feeds (YouTube Shorts, Reels, TikTok in a browser). Arrow keys are the primary
+ * control; mouse-wheel buttons are there for sites that ignore arrow keys. */
+function Shorts({ send, disabled }: PanelProps) {
+  return (
+    <View style={[styles.panel, { flex: 1 }]}>
+      <Button big label="▲  Previous" disabled={disabled} onPress={() => send(key('up'))} style={{ flex: 1 }} />
+      <Button big label="▼  Next" disabled={disabled} onPress={() => send(key('down'))} style={{ flex: 1 }} />
+      <View style={styles.row}>
+        <Button label="Scroll up" variant="ghost" disabled={disabled} onPress={() => send({ type: 'scroll', dx: 0, dy: -1 })} style={styles.flex} />
+        <Button label="Scroll down" variant="ghost" disabled={disabled} onPress={() => send({ type: 'scroll', dx: 0, dy: 1 })} style={styles.flex} />
+      </View>
+      <View style={styles.row}>
+        <Button label="Play / Pause" variant="ghost" disabled={disabled} onPress={() => send(key('space'))} style={styles.flex} />
+        <Button label="Mute" variant="ghost" disabled={disabled} onPress={() => send(media('mute'))} style={styles.flex} />
+      </View>
+    </View>
+  );
+}
 
 function Slides({ send, disabled }: PanelProps) {
   return (
@@ -107,25 +128,50 @@ const SPECIAL: [string, string][] = [
 
 function Keys({ send, disabled }: PanelProps) {
   const [value, setValue] = useState('');
+  const [live, setLive] = useState(true);
   const submit = () => {
     if (!value) return;
     send({ type: 'text', text: value });
     setValue('');
   };
+  // Live mode: every character goes to the laptop as soon as it is typed and the box is
+  // cleared, so there is nothing to diff and no extra tap. Backspace/Enter are sent as keys.
+  const onChange = (v: string) => {
+    if (!live) return setValue(v);
+    if (v) send({ type: 'text', text: v });
+    setValue('');
+  };
   return (
-    <ScrollView contentContainerStyle={styles.panel} keyboardShouldPersistTaps="handled">
+    <ScrollView contentContainerStyle={styles.panel} keyboardShouldPersistTaps="always">
       <TextInput
         value={value}
-        onChangeText={setValue}
-        placeholder="Type here, then Send to type it on the laptop"
+        onChangeText={onChange}
+        onKeyPress={(e) => {
+          if (live && e.nativeEvent.key === 'Backspace') send(key('backspace'));
+        }}
+        placeholder={live ? 'Tap here and type: keys go straight to the laptop' : 'Type here, then tap Type on laptop'}
         placeholderTextColor={colors.muted}
         style={styles.input}
         editable={!disabled}
-        onSubmitEditing={submit}
+        onSubmitEditing={live ? () => send(key('enter')) : submit}
+        blurOnSubmit={false}
+        autoCorrect={false}
+        autoComplete="off"
+        autoCapitalize="none"
+        spellCheck={false}
+        keyboardType={live ? 'visible-password' : 'default'}
         accessibilityLabel="Text to type on laptop"
-        multiline
+        multiline={!live}
       />
-      <Button label="Type on laptop" disabled={disabled || !value} onPress={submit} />
+      <Button
+        label={live ? 'Live typing: ON' : 'Live typing: OFF'}
+        variant="ghost"
+        onPress={() => {
+          setLive((l) => !l);
+          setValue('');
+        }}
+      />
+      {!live ? <Button label="Type on laptop" disabled={disabled || !value} onPress={submit} /> : null}
       <View style={styles.wrap}>
         {SPECIAL.map(([label, k]) => (
           <Button key={k} label={label} variant="ghost" disabled={disabled} onPress={() => send(key(k))} style={styles.special} />
