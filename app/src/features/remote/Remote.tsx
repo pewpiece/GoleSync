@@ -107,25 +107,50 @@ const SPECIAL: [string, string][] = [
 
 function Keys({ send, disabled }: PanelProps) {
   const [value, setValue] = useState('');
+  const [live, setLive] = useState(true);
   const submit = () => {
     if (!value) return;
     send({ type: 'text', text: value });
     setValue('');
   };
+  // Live mode: every character goes to the laptop as soon as it is typed and the box is
+  // cleared, so there is nothing to diff and no extra tap. Backspace/Enter are sent as keys.
+  const onChange = (v: string) => {
+    if (!live) return setValue(v);
+    if (v) send({ type: 'text', text: v });
+    setValue('');
+  };
   return (
-    <ScrollView contentContainerStyle={styles.panel} keyboardShouldPersistTaps="handled">
+    <ScrollView contentContainerStyle={styles.panel} keyboardShouldPersistTaps="always">
       <TextInput
         value={value}
-        onChangeText={setValue}
-        placeholder="Type here, then Send to type it on the laptop"
+        onChangeText={onChange}
+        onKeyPress={(e) => {
+          if (live && e.nativeEvent.key === 'Backspace') send(key('backspace'));
+        }}
+        placeholder={live ? 'Tap here and type: keys go straight to the laptop' : 'Type here, then tap Type on laptop'}
         placeholderTextColor={colors.muted}
         style={styles.input}
         editable={!disabled}
-        onSubmitEditing={submit}
+        onSubmitEditing={live ? () => send(key('enter')) : submit}
+        blurOnSubmit={false}
+        autoCorrect={false}
+        autoComplete="off"
+        autoCapitalize="none"
+        spellCheck={false}
+        keyboardType={live ? 'visible-password' : 'default'}
         accessibilityLabel="Text to type on laptop"
-        multiline
+        multiline={!live}
       />
-      <Button label="Type on laptop" disabled={disabled || !value} onPress={submit} />
+      <Button
+        label={live ? 'Live typing: ON' : 'Live typing: OFF'}
+        variant="ghost"
+        onPress={() => {
+          setLive((l) => !l);
+          setValue('');
+        }}
+      />
+      {!live ? <Button label="Type on laptop" disabled={disabled || !value} onPress={submit} /> : null}
       <View style={styles.wrap}>
         {SPECIAL.map(([label, k]) => (
           <Button key={k} label={label} variant="ghost" disabled={disabled} onPress={() => send(key(k))} style={styles.special} />

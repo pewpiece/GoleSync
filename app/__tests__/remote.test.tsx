@@ -110,19 +110,33 @@ describe('Remote buttons', () => {
     expect(send.mock.calls.map((c) => c[0].action)).toEqual(['play_pause', 'next', 'previous', 'volume_up', 'mute', 'volume_down']);
   });
 
-  it('keyboard sends text and special keys', async () => {
+  it('live typing sends each key at once and clears the box', async () => {
     const send = jest.fn();
     await render(<Remote send={send} />);
     await fireEvent.press(screen.getByText('Keys'));
-    await fireEvent.changeText(screen.getByLabelText('Text to type on laptop'), 'hello');
-    await fireEvent.press(screen.getByLabelText('Type on laptop'));
-    await fireEvent.press(screen.getByLabelText('Backspace'));
-    await fireEvent.press(screen.getByLabelText('Enter'));
+    const box = screen.getByLabelText('Text to type on laptop');
+    await fireEvent.changeText(box, 'h');
+    await fireEvent(box, 'keyPress', { nativeEvent: { key: 'Backspace' } });
+    await fireEvent(box, 'submitEditing');
+    await fireEvent.press(screen.getByLabelText('Tab'));
     expect(send.mock.calls.map((c) => c[0])).toEqual([
-      { type: 'text', text: 'hello' },
+      { type: 'text', text: 'h' },
       { type: 'key', key: 'backspace' },
       { type: 'key', key: 'enter' },
+      { type: 'key', key: 'tab' },
     ]);
+    expect(box.props.value).toBe('');
+  });
+
+  it('batch mode still types the whole box on demand', async () => {
+    const send = jest.fn();
+    await render(<Remote send={send} />);
+    await fireEvent.press(screen.getByText('Keys'));
+    await fireEvent.press(screen.getByLabelText('Live typing: ON'));
+    await fireEvent.changeText(screen.getByLabelText('Text to type on laptop'), 'hello');
+    expect(send).not.toHaveBeenCalled();
+    await fireEvent.press(screen.getByLabelText('Type on laptop'));
+    expect(send).toHaveBeenCalledWith({ type: 'text', text: 'hello' });
   });
 
   it('does nothing while disabled (paused / offline)', async () => {
