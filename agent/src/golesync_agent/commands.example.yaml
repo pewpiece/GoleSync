@@ -4,7 +4,8 @@
 # send command text. Commands run without a shell (argv list), with a timeout.
 # After editing, no restart is needed. Entries with enabled: false are hidden from the phone.
 #
-# Fields: id (a-z 0-9 _ -), label, command (argv list), cwd (optional), confirm (ask on the
+# Fields: id (a-z 0-9 _ -), label, section (groups buttons into titled grids on the phone),
+# command (argv list), cwd (optional), confirm (ask on the
 # phone first), enabled (default true), timeout (seconds, default 60, max 600),
 # detach (start and return at once; for long-running things like a dev server).
 #
@@ -13,181 +14,221 @@
 commands:
   # --- Desktop ---------------------------------------------------------------------------
   - id: lock-screen
+    section: Desktop
     label: Lock screen
     command: ["loginctl", "lock-session"]
 
   - id: screen-off
+    section: Desktop
     label: Screen off
     command: ["xset", "dpms", "force", "off"]
 
   - id: workspace-next
+    section: Desktop
     label: Next desktop
     command: ["xdotool", "key", "ctrl+alt+Right"]    # use ctrl+alt+Down if your desktops are vertical
 
   - id: workspace-prev
+    section: Desktop
     label: Previous desktop
     command: ["xdotool", "key", "ctrl+alt+Left"]
 
   - id: overview
+    section: Desktop
     label: Overview (Super)
     command: ["xdotool", "key", "super"]
 
   - id: show-desktop
+    section: Desktop
     label: Show desktop
     command: ["xdotool", "key", "super+d"]
 
   - id: switch-window
+    section: Desktop
     label: Switch window (Alt+Tab)
     command: ["xdotool", "key", "alt+Tab"]
 
   - id: screenshot
+    section: Desktop
     label: Screenshot
     command: ["xdotool", "key", "Print"]
 
   # --- Editing shortcuts (the phone Keys screen has no chords) ---------------------------
   - id: select-all
+    section: Editing
     label: Select all (Ctrl+A)
     command: ["xdotool", "key", "ctrl+a"]
 
   - id: undo
+    section: Editing
     label: Undo (Ctrl+Z)
     command: ["xdotool", "key", "ctrl+z"]
 
   - id: save
+    section: Editing
     label: Save (Ctrl+S)
     command: ["xdotool", "key", "ctrl+s"]
 
   - id: find
+    section: Editing
     label: Find (Ctrl+F)
     command: ["xdotool", "key", "ctrl+f"]
 
   # --- Browser ---------------------------------------------------------------------------
   - id: browser-new-tab
+    section: Browser
     label: New tab
     command: ["xdotool", "key", "ctrl+t"]
 
   - id: browser-close-tab
+    section: Browser
     label: Close tab
     command: ["xdotool", "key", "ctrl+w"]
     confirm: true
 
   - id: browser-reload
+    section: Browser
     label: Reload page
     command: ["xdotool", "key", "ctrl+r"]
 
   - id: browser-back
+    section: Browser
     label: Back
     command: ["xdotool", "key", "alt+Left"]
 
   - id: browser-forward
+    section: Browser
     label: Forward
     command: ["xdotool", "key", "alt+Right"]
 
   - id: fullscreen
+    section: Browser
     label: Fullscreen (F11)
     command: ["xdotool", "key", "F11"]
 
   - id: zoom-in
+    section: Browser
     label: Zoom in
     command: ["xdotool", "key", "ctrl+plus"]
 
   - id: zoom-out
+    section: Browser
     label: Zoom out
     command: ["xdotool", "key", "ctrl+minus"]
 
   # --- Windows ---------------------------------------------------------------------------
   - id: maximize
+    section: Windows
     label: Maximize window
     command: ["xdotool", "key", "super+Up"]
 
   - id: tile-left
+    section: Windows
     label: Tile window left
     command: ["xdotool", "key", "super+Left"]
 
   - id: tile-right
+    section: Windows
     label: Tile window right
     command: ["xdotool", "key", "super+Right"]
 
   # --- Info (output is shown on the phone) -----------------------------------------------
 
   - id: battery
+    section: Info
     label: Battery %
     command: ["cat", "/sys/class/power_supply/BAT0/capacity"]
 
   - id: disk-free
+    section: Info
     label: Disk space
     command: ["df", "-h", "/", "/home"]
 
   - id: uptime
+    section: Info
     label: Uptime and load
     command: ["uptime"]
 
   - id: ip-address
+    section: Info
     label: IP addresses
     command: ["hostname", "-I"]
 
   # --- Apps (one button each; they start the app and return at once) ---------------------
   # If a button reports "failed to start", find the real command with `which <name>` and edit it.
   - id: app-brave
+    section: Apps
     label: Brave
-    command: ["brave-browser"]
+    command: ["brave"]               # snap/flatpak name; apt installs use "brave-browser"
     detach: true
 
   - id: app-chromium
+    section: Apps
     label: Chromium
     command: ["chromium"]            # snap/apt name; try "chromium-browser" if this fails
     detach: true
 
   - id: app-terminal
+    section: Apps
     label: Terminal
     command: ["x-terminal-emulator"]
     detach: true
 
   - id: app-vscode
+    section: Apps
     label: VS Code
     command: ["code"]
     detach: true
 
   - id: app-slack
+    section: Apps
     label: Slack
     command: ["slack"]
     detach: true
 
   - id: app-postman
+    section: Apps
     label: Postman
     command: ["postman"]             # snap installs it as /snap/bin/postman
     detach: true
 
   - id: app-files
+    section: Apps
     label: Files
     command: ["nautilus"]
     detach: true
 
   # --- Open folders and sites ------------------------------------------------------------
   - id: open-shorts
+    section: Open
     label: Open YouTube Shorts
     command: ["xdg-open", "https://www.youtube.com/shorts"]
 
   - id: open-inbox
+    section: Open
     label: Open GoleSync Inbox folder
     command: ["xdg-open", "~/GoleSync/Inbox"]
 
   - id: open-downloads
+    section: Open
     label: Open Downloads
     command: ["xdg-open", "~/Downloads"]
 
   - id: open-youtube
+    section: Open
     label: Open YouTube
     command: ["xdg-open", "https://www.youtube.com"]
 
   # --- Disabled until you opt in ---------------------------------------------------------
   - id: close-window
+    section: Windows
     label: Close window (Alt+F4)
     command: ["xdotool", "key", "alt+F4"]
     confirm: true
     enabled: false
 
   - id: dev-server
+    section: Dev
     label: Start dev server
     command: ["npm", "run", "dev"]
     cwd: ~/projects/my-app
@@ -196,12 +237,14 @@ commands:
     enabled: false          # set your project path above, then enable
 
   - id: git-pull
+    section: Dev
     label: Git pull
     command: ["git", "pull", "--ff-only"]
     cwd: ~/projects/my-app
     enabled: false
 
   - id: run-tests
+    section: Dev
     label: Run tests
     command: ["npm", "test"]
     cwd: ~/projects/my-app
@@ -209,33 +252,39 @@ commands:
     enabled: false
 
   - id: suspend
+    section: System
     label: Suspend laptop
     command: ["systemctl", "suspend"]
     confirm: true
     enabled: false
 
   - id: wifi-off
+    section: System
     label: Wi-Fi off (you will lose the phone link!)
     command: ["nmcli", "radio", "wifi", "off"]
     confirm: true
     enabled: false
 
   - id: wifi-on
+    section: System
     label: Wi-Fi on
     command: ["nmcli", "radio", "wifi", "on"]
     enabled: false
 
   - id: brightness-up
+    section: System
     label: Brightness +10% (needs brightnessctl)
     command: ["brightnessctl", "set", "+10%"]
     enabled: false
 
   - id: brightness-down
+    section: System
     label: Brightness -10% (needs brightnessctl)
     command: ["brightnessctl", "set", "10%-"]
     enabled: false
 
   - id: empty-trash
+    section: System
     label: Empty trash
     command: ["gio", "trash", "--empty"]
     confirm: true

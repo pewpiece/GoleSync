@@ -21,7 +21,7 @@ export type Status = {
   max_file_bytes: number;
 };
 
-export type CommandInfo = { id: string; label: string; confirm: boolean };
+export type CommandInfo = { id: string; label: string; section: string; confirm: boolean };
 export type CommandResult = {
   id: string;
   exit_code: number | null;

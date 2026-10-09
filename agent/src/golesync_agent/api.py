@@ -173,7 +173,7 @@ def build_router() -> APIRouter:
         cmds = load_commands(_state(request).settings.commands_path)
         return {
             "commands": [
-                {"id": c.id, "label": c.label, "confirm": c.confirm} for c in cmds if c.enabled
+                {"id": c.id, "label": c.label, "section": c.section, "confirm": c.confirm} for c in cmds if c.enabled
             ]
         }
 

@@ -14,8 +14,12 @@ RestartSec=3
 # `systemctl --user import-environment DISPLAY XAUTHORITY` (see install.sh / README).
 PassEnvironment=DISPLAY XAUTHORITY
 
-NoNewPrivileges=true
-PrivateTmp=true
+# Launcher buttons start GUI apps (Brave, VS Code, Slack, snaps...). Those need the normal user
+# environment, so this unit is deliberately NOT sandboxed with NoNewPrivileges/PrivateTmp (which
+# break snap and Chromium/Electron sandboxes). The command allow-list is the security boundary.
+Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin:/snap/bin:/var/lib/flatpak/exports/bin:%h/.local/share/flatpak/exports/bin
+# Apps started from the phone must survive an agent restart.
+KillMode=process
 
 [Install]
 WantedBy=graphical-session.target
