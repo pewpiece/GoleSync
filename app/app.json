@@ -1,0 +1,63 @@
+{
+  "expo": {
+    "name": "GoleSync",
+    "slug": "golesync",
+    "scheme": "golesync",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/branding/icon.png",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#0B1220",
+    "newArchEnabled": true,
+    "ios": {
+      "bundleIdentifier": "dev.pewpiece.golesync",
+      "supportsTablet": false
+    },
+    "android": {
+      "package": "dev.pewpiece.golesync",
+      "versionCode": 1,
+      "permissions": ["CAMERA", "VIBRATE"],
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/branding/adaptive-icon-foreground.png",
+        "backgroundColor": "#0B1220"
+      }
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/branding/splash-icon.png",
+          "backgroundColor": "#0B1220",
+          "imageWidth": 200
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "GoleSync uses the camera only to scan the pairing QR code shown by your laptop.",
+          "recordAudioAndroid": false
+        }
+      ],
+      [
+        "expo-share-intent",
+        {
+          "androidIntentFilters": ["text/*", "image/*", "video/*", "*/*"],
+          "androidMultiIntentFilters": ["image/*", "video/*", "*/*"]
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}
