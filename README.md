@@ -92,7 +92,7 @@ commands:
 ```
 
 No restart needed: the file is re-read for every request. `enabled: false` hides an entry. The
-shipped example only enables "Lock screen". Need pipes or `&&`? Put them in a script you
+shipped example enables a few harmless desktop actions (lock, screen off, next/previous desktop, overview, show desktop, Alt+Tab, screenshot, open YouTube Shorts, open terminal); everything risky (suspend, reboot, shut down, close window) is off and asks for confirmation. To pick up a newer example: `cp agent/src/golesync_agent/commands.example.yaml ~/.config/golesync/commands.yaml` (this replaces your file). Need pipes or `&&`? Put them in a script you
 own and allow-list `["~/bin/my-script.sh"]`.
 
 ## 2. Phone (Android)

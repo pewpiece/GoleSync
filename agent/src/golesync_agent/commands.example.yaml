@@ -7,10 +7,59 @@
 # Fields: id (a-z 0-9 _ -), label, command (argv list), cwd (optional), confirm (ask on the
 # phone first), enabled (default true), timeout (seconds, default 60, max 600),
 # detach (start and return at once; for long-running things like a dev server).
+#
+# The first group is enabled and harmless (needs an X11 session; `xdotool` and `xset` are
+# standard). Everything under "Disabled until you opt in" is hidden until you set enabled: true.
 commands:
+  # --- Desktop ---------------------------------------------------------------------------
   - id: lock-screen
     label: Lock screen
     command: ["loginctl", "lock-session"]
+
+  - id: screen-off
+    label: Screen off
+    command: ["xset", "dpms", "force", "off"]
+
+  - id: workspace-next
+    label: Next desktop
+    command: ["xdotool", "key", "ctrl+alt+Right"]    # use ctrl+alt+Down if your desktops are vertical
+
+  - id: workspace-prev
+    label: Previous desktop
+    command: ["xdotool", "key", "ctrl+alt+Left"]
+
+  - id: overview
+    label: Overview (Super)
+    command: ["xdotool", "key", "super"]
+
+  - id: show-desktop
+    label: Show desktop
+    command: ["xdotool", "key", "super+d"]
+
+  - id: switch-window
+    label: Switch window (Alt+Tab)
+    command: ["xdotool", "key", "alt+Tab"]
+
+  - id: screenshot
+    label: Screenshot
+    command: ["xdotool", "key", "Print"]
+
+  # --- Handy launchers -------------------------------------------------------------------
+  - id: open-shorts
+    label: Open YouTube Shorts
+    command: ["xdg-open", "https://www.youtube.com/shorts"]
+
+  - id: open-terminal
+    label: Open terminal
+    command: ["x-terminal-emulator"]
+    detach: true
+
+  # --- Disabled until you opt in ---------------------------------------------------------
+  - id: close-window
+    label: Close window (Alt+F4)
+    command: ["xdotool", "key", "alt+F4"]
+    confirm: true
+    enabled: false
 
   - id: dev-server
     label: Start dev server
@@ -36,5 +85,17 @@ commands:
   - id: suspend
     label: Suspend laptop
     command: ["systemctl", "suspend"]
+    confirm: true
+    enabled: false
+
+  - id: reboot
+    label: Reboot
+    command: ["systemctl", "reboot"]
+    confirm: true
+    enabled: false
+
+  - id: shutdown
+    label: Shut down
+    command: ["systemctl", "poweroff"]
     confirm: true
     enabled: false

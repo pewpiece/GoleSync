@@ -6,9 +6,10 @@ import { colors, spacing } from '../../theme';
 import { Trackpad } from './Trackpad';
 
 type Send = (ev: object) => unknown;
-export type Mode = 'slides' | 'media' | 'pad' | 'keys';
+export type Mode = 'shorts' | 'slides' | 'media' | 'pad' | 'keys';
 
 const MODES: { id: Mode; label: string }[] = [
+  { id: 'shorts', label: 'Shorts' },
   { id: 'slides', label: 'Slides' },
   { id: 'media', label: 'Media' },
   { id: 'pad', label: 'Trackpad' },
@@ -19,7 +20,7 @@ const key = (k: string) => ({ type: 'key', key: k });
 const media = (a: string) => ({ type: 'media', action: a });
 
 export function Remote({ send, disabled }: { send: Send; disabled?: boolean }) {
-  const [mode, setMode] = useState<Mode>('slides');
+  const [mode, setMode] = useState<Mode>('shorts');
   return (
     <View style={styles.root}>
       <View style={styles.seg}>
@@ -35,6 +36,7 @@ export function Remote({ send, disabled }: { send: Send; disabled?: boolean }) {
           </Text>
         ))}
       </View>
+      {mode === 'shorts' ? <Shorts send={send} disabled={disabled} /> : null}
       {mode === 'slides' ? <Slides send={send} disabled={disabled} /> : null}
       {mode === 'media' ? <Media send={send} disabled={disabled} /> : null}
       {mode === 'pad' ? <Pad send={send} disabled={disabled} /> : null}
@@ -44,6 +46,25 @@ export function Remote({ send, disabled }: { send: Send; disabled?: boolean }) {
 }
 
 type PanelProps = { send: Send; disabled?: boolean };
+
+/** Scrolling feeds (YouTube Shorts, Reels, TikTok in a browser). Arrow keys are the primary
+ * control; mouse-wheel buttons are there for sites that ignore arrow keys. */
+function Shorts({ send, disabled }: PanelProps) {
+  return (
+    <View style={[styles.panel, { flex: 1 }]}>
+      <Button big label="▲  Previous" disabled={disabled} onPress={() => send(key('up'))} style={{ flex: 1 }} />
+      <Button big label="▼  Next" disabled={disabled} onPress={() => send(key('down'))} style={{ flex: 1 }} />
+      <View style={styles.row}>
+        <Button label="Scroll up" variant="ghost" disabled={disabled} onPress={() => send({ type: 'scroll', dx: 0, dy: -1 })} style={styles.flex} />
+        <Button label="Scroll down" variant="ghost" disabled={disabled} onPress={() => send({ type: 'scroll', dx: 0, dy: 1 })} style={styles.flex} />
+      </View>
+      <View style={styles.row}>
+        <Button label="Play / Pause" variant="ghost" disabled={disabled} onPress={() => send(key('space'))} style={styles.flex} />
+        <Button label="Mute" variant="ghost" disabled={disabled} onPress={() => send(media('mute'))} style={styles.flex} />
+      </View>
+    </View>
+  );
+}
 
 function Slides({ send, disabled }: PanelProps) {
   return (

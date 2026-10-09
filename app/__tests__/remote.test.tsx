@@ -89,9 +89,27 @@ describe('TrackpadController', () => {
 });
 
 describe('Remote buttons', () => {
+  it('opens on Shorts: next/previous use arrow keys, scroll buttons use the wheel', async () => {
+    const send = jest.fn();
+    await render(<Remote send={send} />);
+    await fireEvent.press(screen.getByLabelText('\u25BC  Next'));
+    await fireEvent.press(screen.getByLabelText('\u25B2  Previous'));
+    await fireEvent.press(screen.getByLabelText('Scroll down'));
+    await fireEvent.press(screen.getByLabelText('Scroll up'));
+    await fireEvent.press(screen.getByLabelText('Play / Pause'));
+    expect(send.mock.calls.map((c) => c[0])).toEqual([
+      { type: 'key', key: 'down' },
+      { type: 'key', key: 'up' },
+      { type: 'scroll', dx: 0, dy: 1 },
+      { type: 'scroll', dx: 0, dy: -1 },
+      { type: 'key', key: 'space' },
+    ]);
+  });
+
   it('slide buttons send the right keys', async () => {
     const send = jest.fn();
     await render(<Remote send={send} />);
+    await fireEvent.press(screen.getByText('Slides'));
     await fireEvent.press(screen.getByLabelText('Next'));
     await fireEvent.press(screen.getByLabelText('Previous'));
     await fireEvent.press(screen.getByLabelText('Start (F5)'));
@@ -142,7 +160,7 @@ describe('Remote buttons', () => {
   it('does nothing while disabled (paused / offline)', async () => {
     const send = jest.fn();
     await render(<Remote send={send} disabled />);
-    await fireEvent.press(screen.getByLabelText('Next'));
+    await fireEvent.press(screen.getByLabelText('\u25BC  Next'));
     expect(send).not.toHaveBeenCalled();
   });
 });

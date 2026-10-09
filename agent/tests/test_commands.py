@@ -153,5 +153,14 @@ def test_shipped_example_is_valid_and_safe_by_default():
 
     example = Path(golesync_agent.__file__).with_name("commands.example.yaml")
     loaded = load_commands(example)
-    assert {c.id for c in loaded} >= {"lock-screen", "dev-server", "git-pull", "run-tests", "suspend"}
-    assert [c.id for c in loaded if c.enabled] == ["lock-screen"]
+    ids = {c.id for c in loaded}
+    assert ids >= {"lock-screen", "dev-server", "git-pull", "run-tests", "suspend", "workspace-next"}
+    enabled = {c.id for c in loaded if c.enabled}
+    # nothing destructive or project-specific is on by default
+    assert not enabled & {"suspend", "reboot", "shutdown", "close-window", "dev-server", "git-pull", "run-tests"}
+    assert {"lock-screen", "screen-off", "workspace-next", "workspace-prev", "open-shorts"} <= enabled
+    # every risky entry asks for confirmation
+    for c in loaded:
+        if c.id in {"suspend", "reboot", "shutdown", "close-window"}:
+            assert c.confirm and not c.enabled
+    assert all(c.command[0] for c in loaded)
