@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "golesync-agent"
+version = "0.1.0"
+description = "GoleSync laptop agent: phone <-> laptop clipboard, files, remote control and command buttons over the LAN"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi",
+  "uvicorn",
+  "websockets",
+  "pydantic",
+  "pynput",
+  "qrcode",
+  "typer",
+  "PyYAML",
+  "httpx",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-asyncio", "ruff"]
+
+[project.scripts]
+golesync = "golesync_agent.cli:app"
+gsync = "golesync_agent.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+golesync_agent = ["commands.example.yaml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+filterwarnings = ["ignore::DeprecationWarning", "ignore::starlette.exceptions.StarletteDeprecationWarning"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+extend-ignore = ["E501", "B008", "UP042"]

@@ -1,0 +1,21 @@
+[Unit]
+Description=GoleSync agent (phone <-> laptop)
+After=graphical-session.target network-online.target
+Wants=network-online.target
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+# Installed by scripts/install.sh; %h = your home directory.
+ExecStart=%h/.local/share/golesync/venv/bin/golesync serve --no-qr
+Restart=on-failure
+RestartSec=3
+# Remote control needs your X11 session's DISPLAY/XAUTHORITY. They are imported by
+# `systemctl --user import-environment DISPLAY XAUTHORITY` (see install.sh / README).
+PassEnvironment=DISPLAY XAUTHORITY
+
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=graphical-session.target

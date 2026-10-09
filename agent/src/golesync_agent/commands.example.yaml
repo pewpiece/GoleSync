@@ -1,0 +1,40 @@
+# GoleSync command buttons: ~/.config/golesync/commands.yaml
+#
+# This is an ALLOW-LIST. The phone can only ask to run a command by its `id`; it can never
+# send command text. Commands run without a shell (argv list), with a timeout.
+# After editing, no restart is needed. Entries with enabled: false are hidden from the phone.
+#
+# Fields: id (a-z 0-9 _ -), label, command (argv list), cwd (optional), confirm (ask on the
+# phone first), enabled (default true), timeout (seconds, default 60, max 600),
+# detach (start and return at once; for long-running things like a dev server).
+commands:
+  - id: lock-screen
+    label: Lock screen
+    command: ["loginctl", "lock-session"]
+
+  - id: dev-server
+    label: Start dev server
+    command: ["npm", "run", "dev"]
+    cwd: ~/projects/my-app
+    detach: true
+    confirm: true
+    enabled: false          # set your project path above, then enable
+
+  - id: git-pull
+    label: Git pull
+    command: ["git", "pull", "--ff-only"]
+    cwd: ~/projects/my-app
+    enabled: false
+
+  - id: run-tests
+    label: Run tests
+    command: ["npm", "test"]
+    cwd: ~/projects/my-app
+    timeout: 300
+    enabled: false
+
+  - id: suspend
+    label: Suspend laptop
+    command: ["systemctl", "suspend"]
+    confirm: true
+    enabled: false

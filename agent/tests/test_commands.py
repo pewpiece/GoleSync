@@ -1,0 +1,157 @@
+import sys
+import textwrap
+
+import pytest
+
+from golesync_agent.commands import load_commands
+
+
+def write_commands(settings, body: str):
+    settings.config_dir.mkdir(parents=True, exist_ok=True)
+    settings.commands_path.write_text(textwrap.dedent(body))
+
+
+@pytest.fixture
+def cmds(settings):
+    write_commands(
+        settings,
+        f"""
+        commands:
+          - id: hello
+            label: Hello
+            command: ["{sys.executable}", "-c", "print('hi'); print('line2')"]
+          - id: fails
+            label: Fails
+            command: ["{sys.executable}", "-c", "import sys; print('bad'); sys.exit(3)"]
+          - id: risky
+            label: Risky
+            command: ["echo", "done"]
+            confirm: true
+          - id: slow
+            label: Slow
+            command: ["sleep", "30"]
+            timeout: 1
+          - id: off
+            label: Off
+            command: ["echo", "should not run"]
+            enabled: false
+          - id: literal
+            label: Literal
+            command: ["echo", "a; touch PWNED && echo $(id) `id`"]
+          - id: missing
+            label: Missing binary
+            command: ["/nonexistent/binary"]
+          - id: Bad ID!
+            label: Invalid id gets skipped
+            command: ["echo", "x"]
+          - id: tail
+            label: Many lines
+            command: ["{sys.executable}", "-c", "print('\\\\n'.join(str(i) for i in range(500)))"]
+        """,
+    )
+
+
+def test_list_only_enabled_and_hides_argv(client, auth, cmds):
+    items = client.get("/v1/commands", headers=auth).json()["commands"]
+    ids = [c["id"] for c in items]
+    assert "off" not in ids and "Bad ID!" not in ids and "hello" in ids
+    assert all(set(c) == {"id", "label", "confirm"} for c in items)
+
+
+def test_run_returns_exit_code_and_output(client, auth, cmds):
+    r = client.post("/v1/commands/hello/run", headers=auth).json()
+    assert r["exit_code"] == 0 and r["output"].splitlines() == ["hi", "line2"]
+    r = client.post("/v1/commands/fails/run", headers=auth).json()
+    assert r["exit_code"] == 3 and "bad" in r["output"]
+
+
+def test_output_is_tailed(client, auth, cmds):
+    out = client.post("/v1/commands/tail/run", headers=auth).json()["output"].splitlines()
+    assert len(out) == 40 and out[-1] == "499"
+
+
+@pytest.mark.parametrize(
+    "bad_id",
+    ["nope", "hello; rm -rf /", "hello && id", "$(id)", "`id`", "../hello", "hello%00", "HELLO", "off", "Bad ID!"],
+)
+def test_unknown_or_malicious_ids_rejected(client, auth, cmds, bad_id):
+    r = client.post(f"/v1/commands/{bad_id}/run", headers=auth)
+    assert r.status_code in (404, 405)  # never executes anything
+
+
+def test_shell_injection_in_id_runs_nothing(client, auth, cmds, tmp_path):
+    marker = tmp_path / "pwned"
+    client.post(f"/v1/commands/x;touch {marker}/run", headers=auth)
+    client.post("/v1/commands/run", headers=auth, json={"command": f"touch {marker}"})
+    assert not marker.exists()
+
+
+def test_body_cannot_smuggle_command_text(client, auth, cmds):
+    for body in (
+        {"command": "id"},
+        {"argv": ["id"]},
+        {"confirmed": True, "command": "id"},
+        {"id": "hello", "cmd": "id"},
+    ):
+        r = client.post("/v1/commands/hello/run", headers=auth, json=body)
+        assert r.status_code == 422
+
+
+def test_no_shell_so_metacharacters_are_literal(client, auth, cmds, settings):
+    r = client.post("/v1/commands/literal/run", headers=auth).json()
+    assert r["output"].strip() == "a; touch PWNED && echo $(id) `id`"
+    import os
+
+    assert not os.path.exists("PWNED")
+
+
+def test_confirm_required(client, auth, cmds):
+    r = client.post("/v1/commands/risky/run", headers=auth)
+    assert r.status_code == 409 and r.json()["code"] == "confirmation_required"
+    r = client.post("/v1/commands/risky/run", headers=auth, json={"confirmed": True})
+    assert r.status_code == 200 and r.json()["output"].strip() == "done"
+
+
+def test_disabled_command_cannot_run(client, auth, cmds):
+    assert client.post("/v1/commands/off/run", headers=auth).status_code == 404
+
+
+def test_timeout_kills_process(client, auth, cmds):
+    r = client.post("/v1/commands/slow/run", headers=auth).json()
+    assert r["timed_out"] is True and r["exit_code"] is None
+
+
+def test_missing_binary_reports_failure(client, auth, cmds):
+    r = client.post("/v1/commands/missing/run", headers=auth).json()
+    assert r["exit_code"] == 127 and "failed to start" in r["output"]
+
+
+def test_paused_blocks_commands(client, local, auth, cmds):
+    local.post("/local/pause")
+    assert client.post("/v1/commands/hello/run", headers=auth).status_code == 423
+    local.post("/local/resume")
+    assert client.post("/v1/commands/hello/run", headers=auth).status_code == 200
+
+
+def test_requires_token(client, cmds):
+    assert client.post("/v1/commands/hello/run").status_code == 401
+
+
+def test_loader_skips_garbage(settings):
+    write_commands(settings, "commands:\n  - 12\n  - {id: a, label: A, command: []}\n  - {id: ok, label: ok, command: [echo]}\n")
+    assert [c.id for c in load_commands(settings.commands_path)] == ["ok"]
+    settings.commands_path.write_text("::: not yaml [")
+    assert load_commands(settings.commands_path) == []
+    settings.commands_path.unlink()
+    assert load_commands(settings.commands_path) == []
+
+
+def test_shipped_example_is_valid_and_safe_by_default():
+    from pathlib import Path
+
+    import golesync_agent
+
+    example = Path(golesync_agent.__file__).with_name("commands.example.yaml")
+    loaded = load_commands(example)
+    assert {c.id for c in loaded} >= {"lock-screen", "dev-server", "git-pull", "run-tests", "suspend"}
+    assert [c.id for c in loaded if c.enabled] == ["lock-screen"]

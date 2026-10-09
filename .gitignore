@@ -1,0 +1,17 @@
+node_modules/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+.expo/
+dist/
+build/
+android/
+ios/
+*.jks
+*.keystore
+.env
+.env.*
+*.log
