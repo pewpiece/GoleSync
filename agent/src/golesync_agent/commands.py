@@ -7,6 +7,7 @@ import logging
 import os
 import re
 import textwrap
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import yaml
@@ -24,6 +25,7 @@ class CommandSpec(BaseModel):
 
     id: str = Field(pattern=ID_RE.pattern)
     label: str = Field(min_length=1, max_length=60)
+    section: str = Field("General", min_length=1, max_length=40)
     command: list[str] = Field(min_length=1)
     cwd: str | None = None
     confirm: bool = False
@@ -172,32 +174,65 @@ def _raw_entries(path: Path) -> list[dict]:
     return [e for e in items if isinstance(e, dict)] if isinstance(items, list) else []
 
 
-def sync_example(user_path: Path, example_path: Path) -> list[str]:
-    """Append example commands whose id is missing from the user's file. Existing entries
-    (including ones the user edited or disabled) are never touched. Returns added ids."""
+@dataclass
+class SyncResult:
+    added: list[str] = field(default_factory=list)  # example commands appended
+    sectioned: list[str] = field(default_factory=list)  # existing commands given a section
+
+
+def _assign_sections(text: str, example: list[dict], user: list[dict]) -> tuple[str, list[str]]:
+    """Insert `section:` into user entries that lack one, using the example's section for the
+    same id. Pure text edit after the `- id:` line, so comments and the user's edits stay."""
+    wanted = {e["id"]: e["section"] for e in example if "id" in e and "section" in e}
+    done: list[str] = []
+    for e in user:
+        cid = e.get("id")
+        if "section" in e or cid not in wanted:
+            continue
+        pat = re.compile(r"(?m)^([ \t]*)- id:[ \t]*[\"']?" + re.escape(str(cid)) + r"[\"']?[ \t]*\n")
+        m = pat.search(text)
+        if not m:
+            continue  # flow-style entry etc.: leave alone
+        ins = f"{m.group(1)}  section: {wanted[cid]}\n"
+        text = text[: m.end()] + ins + text[m.end() :]
+        done.append(cid)
+    return text, done
+
+
+def sync_example(user_path: Path, example_path: Path) -> SyncResult:
+    """Bring a user's commands.yaml up to date with the shipped example, without touching
+    their edits: (1) put existing commands that have no `section` into the example's section,
+    (2) append example commands whose id is missing. The file is restored if the result
+    would not parse."""
+    result = SyncResult()
+    example = _raw_entries(example_path)
     if not user_path.exists():
         user_path.parent.mkdir(parents=True, exist_ok=True)
         user_path.write_text(example_path.read_text())
-        return [e["id"] for e in _raw_entries(example_path) if "id" in e]
-    have = {e.get("id") for e in _raw_entries(user_path)}
-    missing = [e for e in _raw_entries(example_path) if e.get("id") not in have]
-    if not missing:
-        return []
+        result.added = [e["id"] for e in example if "id" in e]
+        return result
     original = user_path.read_text()
-    block = "".join(
-        textwrap.indent(yaml.safe_dump([e], sort_keys=False, default_flow_style=None), "  ") + "\n"
-        for e in missing
-    )
-    user_data = yaml.safe_load(original) or {}
-    if isinstance(user_data, dict) and user_data.get("commands") and isinstance(user_data["commands"], list):
-        new_text = original.rstrip("\n") + "\n\n  # added by `golesync commands-sync`\n" + block
-    else:
-        new_text = "commands:\n" + block
-    user_path.write_text(new_text)
-    ids = {e["id"] for e in missing}
-    if not ids <= {e.get("id") for e in _raw_entries(user_path)} or not isinstance(
-        yaml.safe_load(user_path.read_text()), dict
-    ):
+    text, result.sectioned = _assign_sections(original, example, _raw_entries(user_path))
+    have = {e.get("id") for e in _raw_entries(user_path)}
+    missing = [e for e in example if e.get("id") not in have]
+    if missing:
+        block = "".join(
+            textwrap.indent(yaml.safe_dump([e], sort_keys=False, default_flow_style=None), "  ") + "\n"
+            for e in missing
+        )
+        data = yaml.safe_load(text) or {}
+        if isinstance(data, dict) and data.get("commands") and isinstance(data["commands"], list):
+            text = text.rstrip("\n") + "\n\n  # added by `golesync commands-sync`\n" + block
+        else:
+            text = "commands:\n" + block
+        result.added = [e["id"] for e in missing]
+    if text == original:
+        return result
+    user_path.write_text(text)
+    parsed = _raw_entries(user_path)
+    ok = {e.get("id") for e in parsed} >= have | set(result.added)
+    ok = ok and all("section" in e for e in parsed if e.get("id") in result.sectioned)
+    if not ok:
         user_path.write_text(original)  # never leave a broken file behind
         raise ValueError("could not merge into commands.yaml; left it unchanged")
-    return sorted(ids, key=[e["id"] for e in missing].index)
+    return result

@@ -80,6 +80,7 @@ Restart the agent after editing.
 commands:
   - id: git-pull                     # a-z 0-9 _ -  (this is all the phone ever sends)
     label: Git pull
+    section: Dev                     # the titled grid this button appears in on the phone
     command: ["git", "pull", "--ff-only"]   # argv list, no shell
     cwd: ~/projects/my-app
     confirm: true                    # phone asks "Run ...?" first

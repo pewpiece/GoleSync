@@ -55,7 +55,7 @@ def test_list_only_enabled_and_hides_argv(client, auth, cmds):
     items = client.get("/v1/commands", headers=auth).json()["commands"]
     ids = [c["id"] for c in items]
     assert "off" not in ids and "Bad ID!" not in ids and "hello" in ids
-    assert all(set(c) == {"id", "label", "confirm"} for c in items)
+    assert all(set(c) == {"id", "label", "section", "confirm"} for c in items)
 
 
 def test_run_returns_exit_code_and_output(client, auth, cmds):
@@ -199,14 +199,18 @@ def test_sync_adds_only_missing_and_keeps_user_edits(tmp_path):
         "# my file\ncommands:\n  - id: lock-screen\n    label: My lock\n    command: [echo, lock]\n    enabled: false\n"
         "  - id: mine\n    label: Mine\n    command: [echo, hi]\n"
     )
-    added = sync_example(user, example)
+    res = sync_example(user, example)
+    added = res.added
     assert "lock-screen" not in added and "app-brave" in added and "mine" not in added
+    assert res.sectioned == ["lock-screen"]  # existing entry gets its section, nothing else changes
     loaded = {c.id: c for c in load_commands(user)}
     assert loaded["lock-screen"].label == "My lock" and loaded["lock-screen"].enabled is False
+    assert loaded["lock-screen"].section == "Desktop" and loaded["mine"].section == "General"
     assert loaded["mine"].command == ["echo", "hi"]
     assert loaded["select-all"].command == ["xdotool", "key", "ctrl+a"]
     assert user.read_text().startswith("# my file")
-    assert sync_example(user, example) == []  # idempotent
+    again = sync_example(user, example)
+    assert again.added == [] and again.sectioned == []  # idempotent
 
 
 def test_sync_creates_missing_file_and_repairs_empty_commands(tmp_path):
@@ -217,10 +221,10 @@ def test_sync_creates_missing_file_and_repairs_empty_commands(tmp_path):
 
     example = Path(golesync_agent.__file__).with_name("commands.example.yaml")
     fresh = tmp_path / "new" / "commands.yaml"
-    assert "lock-screen" in sync_example(fresh, example)
+    assert "lock-screen" in sync_example(fresh, example).added
     empty = tmp_path / "empty.yaml"
     empty.write_text("commands: []\n")
-    assert sync_example(empty, example)
+    assert sync_example(empty, example).added
     assert len(load_commands(empty)) == len(load_commands(example))
 
 
@@ -266,3 +270,21 @@ async def test_detached_missing_binary_says_so():
     spec = CommandSpec(id="nope", label="n", detach=True, command=["/nonexistent/app"])
     r = await run_command([spec], "nope", False)
     assert r.exit_code == 127 and "failed to start" in r.output
+
+
+def test_every_example_command_has_a_section_and_sections_are_few():
+    from pathlib import Path
+
+    import golesync_agent
+
+    example = Path(golesync_agent.__file__).with_name("commands.example.yaml")
+    loaded = load_commands(example)
+    assert all(c.section != "General" for c in loaded)  # none fell back to the default
+    sections = {c.section for c in loaded}
+    assert {"Desktop", "Browser", "Apps", "Info", "Open"} <= sections and len(sections) <= 12
+
+
+def test_api_returns_section(client, auth, settings):
+    write_commands(settings, "commands:\n  - {id: a, label: A, section: Tools, command: [echo]}\n  - {id: b, label: B, command: [echo]}\n")
+    items = client.get("/v1/commands", headers=auth).json()["commands"]
+    assert [(c["id"], c["section"]) for c in items] == [("a", "Tools"), ("b", "General")]

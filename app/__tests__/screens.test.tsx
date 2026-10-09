@@ -149,3 +149,40 @@ describe('sending files', () => {
     expect(formatBytes(5 * 1024 * 1024)).toBe('5.0 MB');
   });
 });
+
+describe('Commands grid', () => {
+  it('shows a titled section per group, in order, each command as a box', async () => {
+    mockServer({
+      '/v1/commands': () => ({
+        body: {
+          commands: [
+            { id: 'a', label: 'Lock screen', section: 'Desktop', confirm: false },
+            { id: 'b', label: 'Brave', section: 'Apps', confirm: false },
+            { id: 'c', label: 'Screen off', section: 'Desktop', confirm: false },
+            { id: 'd', label: 'Old style', confirm: false },
+          ],
+        },
+      }),
+    });
+    await render(<CommandsScreen />);
+    await screen.findByLabelText('Section Desktop');
+    const titles = screen.getAllByText(/^(Desktop|Apps|General)$/).map((n) => n.props.children);
+    expect(titles).toEqual(['Desktop', 'Apps', 'General']); // first-appearance order; missing section -> General
+    expect(screen.getByLabelText('Section Desktop')).toBeTruthy();
+    expect(screen.getByLabelText('Lock screen')).toBeTruthy();
+    expect(screen.getByLabelText('Old style')).toBeTruthy();
+  });
+
+  it('shows the last result in a dismissable card', async () => {
+    mockServer({
+      '/v1/commands': () => ({ body: { commands: [{ id: 'battery', label: 'Battery %', section: 'Info', confirm: false }] } }),
+      '/v1/commands/battery/run': () => ({ body: { id: 'battery', exit_code: 0, timed_out: false, detached: false, pid: null, output: '87' } }),
+    });
+    await render(<CommandsScreen />);
+    await fireEvent.press(await screen.findByLabelText('Battery %'));
+    await screen.findByText('Exit code 0');
+    expect(screen.getByText('87')).toBeTruthy();
+    await fireEvent.press(screen.getByText('Dismiss'));
+    expect(screen.queryByText('Exit code 0')).toBeNull();
+  });
+});
