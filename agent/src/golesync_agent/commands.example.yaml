@@ -44,29 +44,7 @@ commands:
     label: Screenshot
     command: ["xdotool", "key", "Print"]
 
-  # --- Handy launchers -------------------------------------------------------------------
-  - id: open-shorts
-    label: Open YouTube Shorts
-    command: ["xdg-open", "https://www.youtube.com/shorts"]
-
-  - id: open-terminal
-    label: Open terminal
-    command: ["x-terminal-emulator"]
-    detach: true
-
-  # --- Keyboard shortcuts (the phone Keys screen has no chords, so these fill the gap) ---
-  - id: copy
-    label: Copy (Ctrl+C)
-    command: ["xdotool", "key", "ctrl+c"]
-
-  - id: paste
-    label: Paste (Ctrl+V)
-    command: ["xdotool", "key", "ctrl+v"]
-
-  - id: cut
-    label: Cut (Ctrl+X)
-    command: ["xdotool", "key", "ctrl+x"]
-
+  # --- Editing shortcuts (the phone Keys screen has no chords) ---------------------------
   - id: select-all
     label: Select all (Ctrl+A)
     command: ["xdotool", "key", "ctrl+a"]
@@ -130,20 +108,8 @@ commands:
     label: Tile window right
     command: ["xdotool", "key", "super+Right"]
 
-  # --- Sound -----------------------------------------------------------------------------
-  - id: volume-up
-    label: Volume +5%
-    command: ["pactl", "set-sink-volume", "@DEFAULT_SINK@", "+5%"]
-
-  - id: volume-down
-    label: Volume -5%
-    command: ["pactl", "set-sink-volume", "@DEFAULT_SINK@", "-5%"]
-
-  - id: mute-toggle
-    label: Mute / unmute
-    command: ["pactl", "set-sink-mute", "@DEFAULT_SINK@", "toggle"]
-
   # --- Info (output is shown on the phone) -----------------------------------------------
+
   - id: battery
     label: Battery %
     command: ["cat", "/sys/class/power_supply/BAT0/capacity"]
@@ -160,7 +126,48 @@ commands:
     label: IP addresses
     command: ["hostname", "-I"]
 
+  # --- Apps (one button each; they start the app and return at once) ---------------------
+  # If a button reports "failed to start", find the real command with `which <name>` and edit it.
+  - id: app-brave
+    label: Brave
+    command: ["brave-browser"]
+    detach: true
+
+  - id: app-chromium
+    label: Chromium
+    command: ["chromium"]            # snap/apt name; try "chromium-browser" if this fails
+    detach: true
+
+  - id: app-terminal
+    label: Terminal
+    command: ["x-terminal-emulator"]
+    detach: true
+
+  - id: app-vscode
+    label: VS Code
+    command: ["code"]
+    detach: true
+
+  - id: app-slack
+    label: Slack
+    command: ["slack"]
+    detach: true
+
+  - id: app-postman
+    label: Postman
+    command: ["postman"]             # snap installs it as /snap/bin/postman
+    detach: true
+
+  - id: app-files
+    label: Files
+    command: ["nautilus"]
+    detach: true
+
   # --- Open folders and sites ------------------------------------------------------------
+  - id: open-shorts
+    label: Open YouTube Shorts
+    command: ["xdg-open", "https://www.youtube.com/shorts"]
+
   - id: open-inbox
     label: Open GoleSync Inbox folder
     command: ["xdg-open", "~/GoleSync/Inbox"]

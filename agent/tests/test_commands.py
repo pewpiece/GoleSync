@@ -179,6 +179,11 @@ def test_example_has_no_duplicate_ids_and_valid_risky_entries():
     for risky in ("wifi-off", "empty-trash", "reboot", "shutdown", "suspend", "close-window"):
         assert by_id[risky].confirm and not by_id[risky].enabled
     assert by_id["browser-close-tab"].confirm
+    for gone in ("copy", "paste", "cut", "volume-up", "volume-down", "mute-toggle", "open-terminal"):
+        assert gone not in by_id
+    for app in ("brave", "chromium", "terminal", "vscode", "slack", "postman", "files"):
+        c = by_id[f"app-{app}"]
+        assert c.enabled and c.detach and not c.confirm
 
 
 def test_sync_adds_only_missing_and_keeps_user_edits(tmp_path):
@@ -194,11 +199,11 @@ def test_sync_adds_only_missing_and_keeps_user_edits(tmp_path):
         "  - id: mine\n    label: Mine\n    command: [echo, hi]\n"
     )
     added = sync_example(user, example)
-    assert "lock-screen" not in added and "copy" in added and "mine" not in added
+    assert "lock-screen" not in added and "app-brave" in added and "mine" not in added
     loaded = {c.id: c for c in load_commands(user)}
     assert loaded["lock-screen"].label == "My lock" and loaded["lock-screen"].enabled is False
     assert loaded["mine"].command == ["echo", "hi"]
-    assert loaded["copy"].command == ["xdotool", "key", "ctrl+c"]
+    assert loaded["select-all"].command == ["xdotool", "key", "ctrl+a"]
     assert user.read_text().startswith("# my file")
     assert sync_example(user, example) == []  # idempotent
 
