@@ -130,7 +130,7 @@ commands:
   # If a button reports "failed to start", find the real command with `which <name>` and edit it.
   - id: app-brave
     label: Brave
-    command: ["brave-browser"]
+    command: ["brave"]               # snap/flatpak name; apt installs use "brave-browser"
     detach: true
 
   - id: app-chromium
