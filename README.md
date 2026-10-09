@@ -91,7 +91,7 @@ commands:
     detach: true                     # start and return immediately
 ```
 
-No restart needed: the file is re-read for every request. `enabled: false` hides an entry. shipped example enables a set of harmless buttons: lock/screen off, desktop switching, window tiling, editing and browser shortcuts, battery/disk/uptime info, one-tap app launchers (Brave, Chromium, Terminal, VS Code, Slack, Postman, Files) and folder/site openers. Anything risky (suspend, reboot, shut down, close window, Wi-Fi off, empty trash) is off and asks for confirmation. Launchers use the usual command names, so if one fails run `which <name>` and edit its `command`. To pick up new example commands without losing your edits, run `golesync commands-sync` (it only appends commands whose id you don't have yet). Need pipes or `&&`? Put them in a script you
+No restart needed: the file is re-read for every request. `enabled: false` hides an entry. shipped example enables a set of harmless buttons: lock/screen off, desktop switching, window tiling, editing and browser shortcuts, battery/disk/uptime info, one-tap app launchers (Brave, Chromium, Terminal, VS Code, Slack, Postman, Files) and folder/site openers. Anything risky (suspend, close window, Wi-Fi off, empty trash) is off and asks for confirmation. Launchers use the usual command names, so if one fails run `which <name>` and edit its `command`. To pick up new example commands without losing your edits, run `golesync commands-sync` (it only appends commands whose id you don't have yet). Need pipes or `&&`? Put them in a script you
 own and allow-list `["~/bin/my-script.sh"]`.
 
 ## 2. Phone (Android)

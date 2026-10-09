@@ -157,11 +157,11 @@ def test_shipped_example_is_valid_and_safe_by_default():
     assert ids >= {"lock-screen", "dev-server", "git-pull", "run-tests", "suspend", "workspace-next"}
     enabled = {c.id for c in loaded if c.enabled}
     # nothing destructive or project-specific is on by default
-    assert not enabled & {"suspend", "reboot", "shutdown", "close-window", "dev-server", "git-pull", "run-tests"}
+    assert not enabled & {"suspend", "close-window", "dev-server", "git-pull", "run-tests"}
     assert {"lock-screen", "screen-off", "workspace-next", "workspace-prev", "open-shorts"} <= enabled
     # every risky entry asks for confirmation
     for c in loaded:
-        if c.id in {"suspend", "reboot", "shutdown", "close-window"}:
+        if c.id in {"suspend", "close-window"}:
             assert c.confirm and not c.enabled
     assert all(c.command[0] for c in loaded)
 
@@ -176,9 +176,10 @@ def test_example_has_no_duplicate_ids_and_valid_risky_entries():
     assert len(raw_ids) == len(set(raw_ids))
     assert len(load_commands(example)) == len(raw_ids)  # none silently skipped as invalid
     by_id = {c.id: c for c in load_commands(example)}
-    for risky in ("wifi-off", "empty-trash", "reboot", "shutdown", "suspend", "close-window"):
+    for risky in ("wifi-off", "empty-trash", "suspend", "close-window"):
         assert by_id[risky].confirm and not by_id[risky].enabled
     assert by_id["browser-close-tab"].confirm
+    assert "reboot" not in by_id and "shutdown" not in by_id
     for gone in ("copy", "paste", "cut", "volume-up", "volume-down", "mute-toggle", "open-terminal"):
         assert gone not in by_id
     for app in ("brave", "chromium", "terminal", "vscode", "slack", "postman", "files"):

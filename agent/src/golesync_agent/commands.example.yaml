@@ -214,18 +214,6 @@ commands:
     confirm: true
     enabled: false
 
-  - id: reboot
-    label: Reboot
-    command: ["systemctl", "reboot"]
-    confirm: true
-    enabled: false
-
-  - id: shutdown
-    label: Shut down
-    command: ["systemctl", "poweroff"]
-    confirm: true
-    enabled: false
-
   - id: wifi-off
     label: Wi-Fi off (you will lose the phone link!)
     command: ["nmcli", "radio", "wifi", "off"]
