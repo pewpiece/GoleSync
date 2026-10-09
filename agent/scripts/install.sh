@@ -27,7 +27,9 @@ install -m 644 "$HERE/systemd/golesync.service" "$UNIT_DIR/golesync.service"
 "$VENV/bin/golesync" init
 systemctl --user daemon-reload
 systemctl --user import-environment DISPLAY XAUTHORITY || true
-systemctl --user enable --now golesync.service
+systemctl --user enable golesync.service
+# restart (not just start): a service that is already running would otherwise keep the OLD code
+systemctl --user restart golesync.service
 
 echo
 echo "Installed. Make sure $BIN is on your PATH, then pair your phone:"
