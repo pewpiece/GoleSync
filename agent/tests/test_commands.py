@@ -222,3 +222,47 @@ def test_sync_creates_missing_file_and_repairs_empty_commands(tmp_path):
     empty.write_text("commands: []\n")
     assert sync_example(empty, example)
     assert len(load_commands(empty)) == len(load_commands(example))
+
+
+async def test_detached_failure_is_reported_with_output():
+    from golesync_agent.commands import CommandSpec, run_command
+
+    spec = CommandSpec(
+        id="boom", label="b", detach=True,
+        command=[sys.executable, "-c", "import sys; print('no display'); sys.exit(3)"],
+    )  # fmt: skip
+    r = await run_command([spec], "boom", False)
+    assert r.exit_code == 3 and not r.detached and "no display" in r.output
+
+
+async def test_detached_long_runner_returns_pid_and_keeps_running(monkeypatch):
+    import os
+    import signal
+
+    from golesync_agent import commands
+    from golesync_agent.commands import CommandSpec, run_command
+
+    monkeypatch.setattr(commands, "DETACH_GRACE", 0.3)
+    spec = CommandSpec(id="srv", label="s", detach=True, command=["sleep", "30"])
+    r = await run_command([spec], "srv", False)
+    try:
+        assert r.detached and r.pid and r.exit_code is None
+        os.kill(r.pid, 0)  # still alive
+    finally:
+        os.killpg(r.pid, signal.SIGKILL)
+
+
+async def test_detached_quick_success_counts_as_started():
+    from golesync_agent.commands import CommandSpec, run_command
+
+    spec = CommandSpec(id="hand", label="h", detach=True, command=["true"])
+    r = await run_command([spec], "hand", False)
+    assert r.detached and r.exit_code == 0
+
+
+async def test_detached_missing_binary_says_so():
+    from golesync_agent.commands import CommandSpec, run_command
+
+    spec = CommandSpec(id="nope", label="n", detach=True, command=["/nonexistent/app"])
+    r = await run_command([spec], "nope", False)
+    assert r.exit_code == 127 and "failed to start" in r.output

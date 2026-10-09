@@ -13,6 +13,7 @@ import yaml
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 log = logging.getLogger("golesync")
+DETACH_GRACE = 1.5  # seconds a detached command is watched for an immediate failure
 OUTPUT_LINES = 40
 OUTPUT_BYTES = 8000
 ID_RE = re.compile(r"^[a-z0-9][a-z0-9_-]{0,63}$")
@@ -76,6 +77,50 @@ def tail(text: str) -> str:
     return "\n".join(lines)[-OUTPUT_BYTES:]
 
 
+_background: set[asyncio.Task] = set()
+
+
+async def _run_detached(spec: CommandSpec, argv: list[str], cwd: str | None) -> CommandResult:
+    """Start a long-running command and return. It is watched for DETACH_GRACE seconds so an
+    immediate failure (missing binary, sandbox error, no display) is reported with its output
+    instead of silently doing nothing. Afterwards its output is drained and discarded."""
+    proc = await asyncio.create_subprocess_exec(
+        *argv,
+        cwd=cwd,
+        stdin=asyncio.subprocess.DEVNULL,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.STDOUT,
+        start_new_session=True,
+    )
+    buf = bytearray()
+
+    async def pump() -> None:
+        assert proc.stdout is not None
+        while chunk := await proc.stdout.read(4096):
+            if len(buf) < 32_768:
+                buf.extend(chunk)
+
+    pump_task = asyncio.create_task(pump())
+    try:
+        await asyncio.wait_for(asyncio.shield(proc.wait()), timeout=DETACH_GRACE)
+    except TimeoutError:
+        # still running: keep draining its output in the background so it never blocks
+        _background.add(pump_task)
+        pump_task.add_done_callback(_background.discard)
+        return CommandResult(
+            id=spec.id, exit_code=None, detached=True, pid=proc.pid, output=tail(buf.decode(errors="replace"))
+        )
+    try:  # exited quickly; collect what it printed (a forked child may hold the pipe open)
+        await asyncio.wait_for(asyncio.shield(pump_task), timeout=1.0)
+    except TimeoutError:
+        _background.add(pump_task)
+        pump_task.add_done_callback(_background.discard)
+    out = tail(buf.decode(errors="replace"))
+    if proc.returncode == 0:  # launcher scripts (code, xdg-open) hand off and exit 0
+        return CommandResult(id=spec.id, exit_code=0, detached=True, pid=proc.pid, output=out)
+    return CommandResult(id=spec.id, exit_code=proc.returncode, output=out)
+
+
 async def run_command(
     commands: list[CommandSpec], cmd_id: str, confirmed: bool
 ) -> CommandResult:
@@ -88,15 +133,7 @@ async def run_command(
     argv = [os.path.expanduser(a) if a.startswith("~/") else a for a in spec.command]
     try:
         if spec.detach:
-            proc = await asyncio.create_subprocess_exec(
-                *argv,
-                cwd=cwd,
-                stdin=asyncio.subprocess.DEVNULL,
-                stdout=asyncio.subprocess.DEVNULL,
-                stderr=asyncio.subprocess.DEVNULL,
-                start_new_session=True,
-            )
-            return CommandResult(id=spec.id, exit_code=None, detached=True, pid=proc.pid)
+            return await _run_detached(spec, argv, cwd)
         proc = await asyncio.create_subprocess_exec(  # argv list, never a shell
             *argv,
             cwd=cwd,

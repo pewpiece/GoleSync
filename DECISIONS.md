@@ -40,3 +40,7 @@ Made without asking, as requested. Revisit any of them.
 * `ci.yml` is reusable (`workflow_call`) so the release workflow runs the same checks first.
 * The APK is built with Gradle (the Expo template signs release builds with the debug key), then **re-signed with `apksigner`** from the base64 keystore. This avoids depending on Gradle signing-property names that change between AGP versions.
 * Version name from the tag (`APP_VERSION`), version code from `github.run_number` via `app.config.ts`.
+
+## Launcher buttons (added after real-world testing)
+* Detached commands (app launchers, dev server) are watched for 1.5 s. An immediate failure (missing binary, sandbox/display error) is returned with its output so the phone shows the reason; a running app returns its pid and its output is drained and discarded afterwards.
+* The systemd unit no longer sets `NoNewPrivileges`/`PrivateTmp`: they break snap apps and Chromium/Electron sandboxes (Brave, VS Code, Slack, Postman, Chromium). It sets an explicit `PATH` (incl. `/snap/bin`, flatpak) and `KillMode=process` so apps survive an agent restart. The allow-list stays the security boundary.
