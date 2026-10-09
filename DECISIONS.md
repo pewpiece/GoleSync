@@ -20,6 +20,7 @@ Made without asking, as requested. Revisit any of them.
 * **Kill switch cannot be undone from the phone** on purpose; only loopback can resume.
 * **History** is JSON lines (cap 1000 items, oldest files in the outbox are deleted with them).
 * Clipboard: `xclip`, then `xsel`, then `wl-copy` (Wayland), then pyperclip if installed. No hard dependency on any.
+* **Real X11 tests:** `agent/tests/test_x11_integration.py` starts an Xvfb server and drives the real pynput/xdotool backends and `xclip`; it skips itself when those tools are missing, and CI installs them.
 * Python deps are listed unpinned in `pyproject.toml` and pinned in `agent/requirements.txt` (generated with `uv pip freeze`).
 
 ## App

@@ -35,7 +35,7 @@ golesync_agent = ["commands.example.yaml"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
-filterwarnings = ["ignore::DeprecationWarning", "ignore::starlette.exceptions.StarletteDeprecationWarning"]
+filterwarnings = ["ignore::DeprecationWarning", "ignore::starlette.exceptions.StarletteDeprecationWarning", "ignore::pytest.PytestUnraisableExceptionWarning"]
 
 [tool.ruff]
 line-length = 110

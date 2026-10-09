@@ -141,7 +141,7 @@ name comes from the tag, the version code from the workflow run number.
 ## 4. Development
 
 ```bash
-# agent
+# agent (the X11 tests need: sudo apt install xvfb xdotool xclip; they skip otherwise)
 cd agent && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt && .venv/bin/pip install pytest pytest-asyncio ruff && .venv/bin/pip install --no-deps -e .
 .venv/bin/ruff check src tests && .venv/bin/python -m pytest -q
 
